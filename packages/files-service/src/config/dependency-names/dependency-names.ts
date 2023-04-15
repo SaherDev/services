@@ -1,0 +1,1 @@
+export const FILES_RETRIEVER = 'FILES_RETRIEVER';

@@ -11,6 +11,7 @@
     "new:service": "nest new --skip-git --skip-install --collection=@nestjs/schematics packages/service"
   },
   "devDependencies": {
+    "@nestjs/cli": "^9.0.0",
     "@types/node": "^17.0.24",
     "@yarnpkg/pnpify": "^4.0.0-rc.42",
     "eslint": "^8.38.0",

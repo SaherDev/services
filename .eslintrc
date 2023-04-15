@@ -1,17 +1,8 @@
 {
   "root": true,
-  "env": {
-    "browser": true,
-    "es6": true
-  },
   "extends": ["airbnb", "prettier", "plugin:prettier/recommended"],
-  "plugins": ["import", "jsx-a11y", "react", "react-hooks", "prettier"],
+  "plugins": ["import", "prettier"],
   "rules": {
     "prettier/prettier": "error"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
   }
 }

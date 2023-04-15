@@ -5,7 +5,7 @@ import {
   PutObjectCommandOutput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { IStorage, StorageObjectType, StorageResponse } from '@/models';
+import { IStorage, IStorageResponse, StorageObjectType } from '@/models';
 
 import { fromIni } from '@aws-sdk/credential-providers';
 
@@ -21,7 +21,7 @@ export class S3 implements IStorage {
     region: Readonly<string>,
     profile: Readonly<string>,
     credentialsPath: Readonly<string>
-  ): StorageResponse<T> {
+  ): IStorageResponse<T> {
     if (!region || !profile || !credentialsPath) {
       this.ready = false;
 
@@ -64,7 +64,7 @@ export class S3 implements IStorage {
     bucketName: Readonly<string>,
     key: Readonly<string>,
     body: Readonly<StorageObjectType>
-  ): Promise<StorageResponse<T>> {
+  ): Promise<IStorageResponse<T>> {
     if (!this.ready) {
       return {
         success: false,
@@ -113,7 +113,7 @@ export class S3 implements IStorage {
   async getObject<T>(
     bucketName: Readonly<string>,
     key: Readonly<string>
-  ): Promise<StorageResponse<T>> {
+  ): Promise<IStorageResponse<T>> {
     if (!this.ready) {
       return {
         success: false,

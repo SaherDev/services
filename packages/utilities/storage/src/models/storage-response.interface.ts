@@ -1,4 +1,4 @@
-export interface StorageResponse<T> {
+export interface IStorageResponse<T> {
   success: boolean;
   errorMessage?: string;
   returnObject?: T;

@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   IStorage,
   STORAGE,
-  StorageResponse,
+  IStorageResponse,
 } from '@services/utilities-storage';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class FilesRetriever implements IFilesRetriever {
   }
 
   private initializeStorage() {
-    let response: StorageResponse<any>;
+    let response: IStorageResponse<any>;
 
     try {
       response = this.storageUtil.initialize<any>('dlldkld', 'dlkdkl', 'ldkld');

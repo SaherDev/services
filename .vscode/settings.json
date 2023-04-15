@@ -10,5 +10,8 @@
   },
   "prettier.useEditorConfig": false,
   "prettier.configPath": ".prettierrc",
-  "prettier.ignorePath": ".prettierignore"
+  "prettier.ignorePath": ".prettierignore",
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
 }

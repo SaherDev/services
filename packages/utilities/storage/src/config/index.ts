@@ -1,1 +1,1 @@
-export * from './dependency-names'
+export * from './dependency-names';

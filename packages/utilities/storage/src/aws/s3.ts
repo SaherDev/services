@@ -31,7 +31,17 @@ export class S3 implements IStorage {
       };
     }
 
-    this.client = this.createClient(region, profile, credentialsPath);
+    try {
+      this.client = new S3Client({
+        region: region,
+        credentials: fromIni({
+          profile: profile,
+          filepath: credentialsPath,
+        }),
+      });
+    } catch (err) {
+      this.client = null;
+    }
 
     if (!this.client) {
       this.ready = false;
@@ -144,26 +154,5 @@ export class S3 implements IStorage {
       success: true,
       returnObject: responseObject.Body as any,
     };
-  }
-
-  private createClient(
-    region: Readonly<string>,
-    profile: Readonly<string>,
-    credentialsPath: Readonly<string>
-  ): S3Client {
-    let client: S3Client;
-
-    try {
-      client = new S3Client({
-        region: region,
-        credentials: fromIni({
-          profile: profile,
-          filepath: credentialsPath,
-        }),
-      });
-    } catch (err) {
-      client = null;
-    }
-    return client;
   }
 }

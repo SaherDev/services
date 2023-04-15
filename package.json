@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "lerna run build --parallel",
-    "version":"lerna version"
+    "version": "lerna version"
   },
   "devDependencies": {
     "@types/node": "^17.0.24",
@@ -23,7 +23,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "lerna": "^6.6.1",
     "prettier": "^2.8.7",
-    "typescript": "4.9.3"
+    "typescript": "^4.9.3"
   },
   "packageManager": "yarn@3.2.4"
 }

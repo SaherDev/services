@@ -38,7 +38,7 @@ export class S3 implements IStorage {
 
       return {
         success: false,
-        errorMessage: 'creating client faild',
+        errorMessage: 'creating client failed',
       };
     }
 

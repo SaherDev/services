@@ -1,4 +1,4 @@
-import { IFilesRetriever } from './files-retriever.interfcae';
+import { IFilesRetriever } from './files-retriever.interface';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   IStorage,

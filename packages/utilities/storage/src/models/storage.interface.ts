@@ -1,4 +1,3 @@
-import { IStorageResponse } from './storage-response.interface';
 import { StorageObjectType } from './storage-object-type';
 
 export interface IStorage {
@@ -6,16 +5,13 @@ export interface IStorage {
     region: Readonly<string>,
     profile: Readonly<string>,
     credentialsPath: Readonly<string>
-  ): IStorageResponse<T>;
+  ): T;
 
   putObject<T>(
     bucketName: Readonly<string>,
     key: Readonly<string>,
     Object: Readonly<StorageObjectType>
-  ): Promise<IStorageResponse<T>>;
+  ): Promise<T>;
 
-  getObject<T>(
-    bucketName: Readonly<string>,
-    key: Readonly<string>
-  ): Promise<IStorageResponse<T>>;
+  getObject<T>(bucketName: Readonly<string>, key: Readonly<string>): Promise<T>;
 }

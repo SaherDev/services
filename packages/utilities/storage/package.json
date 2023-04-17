@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.312.0",
-    "@aws-sdk/credential-providers": "^3.312.0"
+    "@aws-sdk/credential-providers": "^3.312.0",
+    "gaxios": "^5.1.0",
+    "googleapis": "^118.0.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.24",

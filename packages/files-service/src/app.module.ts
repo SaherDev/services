@@ -1,3 +1,4 @@
+import { QUEUE, Sqs } from '@services/utilities-queue';
 import { S3, STORAGE } from '@services/utilities-storage';
 
 import { AppController } from './app.controller';
@@ -14,6 +15,10 @@ import { Module } from '@nestjs/common';
     {
       provide: STORAGE,
       useClass: S3,
+    },
+    {
+      provide: QUEUE,
+      useClass: Sqs,
     },
     {
       provide: FILES_RETRIEVER,

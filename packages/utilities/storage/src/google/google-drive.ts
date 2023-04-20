@@ -1,6 +1,7 @@
 import { IStorage, StorageObjectType } from '@/models';
 import { drive_v3, google } from 'googleapis';
 
+import { FolderMemType } from './mem-types';
 import { GaxiosResponse } from 'gaxios';
 
 export class GoogleDrive implements IStorage {
@@ -83,7 +84,7 @@ export class GoogleDrive implements IStorage {
     let error: any = null;
     try {
       responseObject = await this.client.files.list({
-        q: `${key} and '${bucketName}' in parents`,
+        q: `id = ${key}  and '${bucketName}' in parents`,
       });
     } catch (err: any) {
       error = err;
@@ -103,7 +104,7 @@ export class GoogleDrive implements IStorage {
   private createParamsResource(
     bucketName: Readonly<string>,
     key: Readonly<string>,
-    object: Readonly<Blob>
+    object?: Readonly<Blob>
   ): drive_v3.Params$Resource$Files$Create {
     const paramsResource: drive_v3.Params$Resource$Files$Create = {
       fields: 'id',
@@ -115,13 +116,12 @@ export class GoogleDrive implements IStorage {
       media: undefined,
     };
 
-    if (!object) {
+    if (object) {
       paramsResource.media = {
         body: object.stream(),
       };
     } else {
-      paramsResource.requestBody.mimeType =
-        'application/vnd.google-apps.folder';
+      paramsResource.requestBody.mimeType = FolderMemType;
     }
 
     return paramsResource;

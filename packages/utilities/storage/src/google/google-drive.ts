@@ -80,12 +80,16 @@ export class GoogleDrive implements IStorage {
         `fields are missing >>  bucketName = ${bucketName} , key = ${key}'}`
       );
 
-    let responseObject: GaxiosResponse<drive_v3.Schema$FileList> = null;
+    let responseObject: GaxiosResponse<drive_v3.Schema$File> = null;
     let error: any = null;
     try {
-      responseObject = await this.client.files.list({
-        q: `id = ${key}  and '${bucketName}' in parents`,
-      });
+      responseObject = await this.client.files.get(
+        {
+          key,
+          alt: 'media',
+        },
+        { responseType: 'arraybuffer' }
+      );
     } catch (err: any) {
       error = err;
       responseObject = null;

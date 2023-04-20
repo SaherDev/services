@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "build": "lerna run build --parallel",
-    "version": "lerna version"
+    "version": "lerna version",
+    "remove:package": " remove Manually and run > lerna bootstrap --scope @services/package-name --no-ci --force-local"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

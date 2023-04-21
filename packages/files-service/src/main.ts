@@ -28,6 +28,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       disableErrorMessages:
         configService.get<string>('environment.type') === 'production',
       enableDebugMessages:

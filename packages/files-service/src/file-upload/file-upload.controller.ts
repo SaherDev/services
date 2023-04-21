@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FileUploadService } from './file-upload.service';
 
 @Controller('upload')
+@ApiTags('upload')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 

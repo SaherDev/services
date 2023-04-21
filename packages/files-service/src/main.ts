@@ -1,3 +1,4 @@
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -13,6 +14,16 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter()
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('files-service')
+    .setDescription('files service for files upload')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   const configService: ConfigService = app.get(ConfigService);
 
   app.useGlobalPipes(

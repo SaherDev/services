@@ -1,29 +1,26 @@
-import { QUEUE, Sqs } from '@services/utilities-queue';
-import { S3, STORAGE } from '@services/utilities-storage';
+import { configValidationSchema, configurationYaml } from '@/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { FILES_RETRIEVER } from '@/config';
-import { FilesRetriever } from '@/providers';
+import { ConfigModule } from '@nestjs/config';
+import { FileUploadModule } from '@/file-upload';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: STORAGE,
-      useClass: S3,
-    },
-    {
-      provide: QUEUE,
-      useClass: Sqs,
-    },
-    {
-      provide: FILES_RETRIEVER,
-      useClass: FilesRetriever,
-    },
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      load: [
+        () => {
+          return configurationYaml(`${process.env.FILES_SERVICE_FILE_PATH}`);
+        },
+      ],
+      validationSchema: configValidationSchema,
+    }),
+    FileUploadModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

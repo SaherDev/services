@@ -4,14 +4,35 @@ import {
 } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter()
   );
-  await app.listen(3000, '0.0.0.0');
+  const configService: ConfigService = app.get(ConfigService);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      disableErrorMessages:
+        configService.get<string>('environment.type') === 'production',
+      enableDebugMessages:
+        configService.get<string>('environment.type') !== 'production',
+    })
+  );
+
+  await app
+    .listen(configService.get<number>('environment.port'), '0.0.0.0')
+    .then(() => {
+      console.log(
+        `-------------- Started on port ${configService.get<number>(
+          'environment.port'
+        )} --------------`
+      );
+    });
 }
 
 bootstrap();

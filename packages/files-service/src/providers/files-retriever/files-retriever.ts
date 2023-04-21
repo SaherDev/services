@@ -1,61 +1,63 @@
 import { ConfigService } from '@nestjs/config';
 import { IFilesRetriever } from './files-retriever.interface';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IStorage, STORAGE } from '@services/utilities-storage';
 import * as fs from 'fs';
+import * as path from 'path';
+import { ENV_CONFIG_FILE_PATH } from '@/config';
+
 @Injectable()
 export class FilesRetriever implements IFilesRetriever {
-  private ready: boolean;
   private bucket: string;
+  private storageProvider = '';
   constructor(
     @Inject(STORAGE) private readonly storageUtil: IStorage,
     private readonly configServe: ConfigService
   ) {
+    // this.storageProvider = "googleDrive";
+    this.storageProvider = 's3';
+
     this.initializeStorage();
+
     this.bucket = this.configServe.get<string>(
-      'environment.storage.googleDrive.bucket'
+      `environment.storage.${this.storageProvider}.bucket`
     );
   }
 
-  get(key: string): Promise<string> {
-    return new Promise((resolve) => {
-      resolve(key);
-    });
+  async get(key: string): Promise<any> {
+    return await this.storageUtil.getObject(this.bucket, key);
   }
-  async set(Key: string, body: string): Promise<void> {
-    let response: any;
-    try {
-      const file: Buffer = await fs.readFileSync(
-        '/Users/saherheib/dev/repos/services/packages/files-service/src/providers/files-retriever/test.png'
-      );
-      response = await this.storageUtil.putObject(
-        this.bucket,
-        'test.png',
-        file
-      );
-    } catch (error) {
-      response = null;
-    }
 
-    return response;
+  async set(Key: string, body: string): Promise<void> {
+    return await this.storageUtil.putObject(
+      this.bucket,
+      'test.png',
+      this.readTestFile()
+    );
   }
 
   private initializeStorage() {
-    let response: any;
-    try {
-      response = this.storageUtil.initialize<any>(
-        this.configServe.get<string>('environment.storage.googleDrive.region'),
-        this.configServe.get<string>('environment.storage.googleDrive.profile'),
+    this.storageUtil.initialize<any>(
+      this.configServe.get<string>(
+        `environment.storage.${this.storageProvider}.region`
+      ),
+      this.configServe.get<string>(
+        `environment.storage.${this.storageProvider}.profile`
+      ),
+      this.calculateCredentialsPath(
         this.configServe.get<string>(
-          'environment.storage.googleDrive.credentialsPath'
+          `environment.storage.${this.storageProvider}.credentialsPath`
         )
-      );
-    } catch (error) {
-      response = null;
-    }
-
-    if (!response) {
-      this.ready = false;
-    }
+      )
+    );
   }
+
+  private calculateCredentialsPath = (filePath: string) => {
+    return path.join(path.dirname(ENV_CONFIG_FILE_PATH), filePath);
+  };
+
+  private readTestFile = (): Buffer => {
+    //XXX:FILE PATH HERE
+    return fs.readFileSync('test.png');
+  };
 }

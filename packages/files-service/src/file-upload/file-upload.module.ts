@@ -15,14 +15,14 @@ import { Module } from '@nestjs/common';
       provide: FILES_RETRIEVER,
       useClass: FilesRetriever,
     },
-    // {
-    //   provide: STORAGE,
-    //   useClass: S3,
-    // },
     {
       provide: STORAGE,
-      useClass: GoogleDrive,
+      useClass: S3,
     },
+    // {
+    //   provide: STORAGE,
+    //   useClass: GoogleDrive,
+    // },
     {
       provide: QUEUE,
       useClass: Sqs,

@@ -9,7 +9,7 @@ export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
   @Get('file/:id')
-  getFile(@Param('id') fileId: string) {
+  getFile(@Param('id') fileId: string): Promise<any> {
     return this.fileUploadService.getFile(fileId);
   }
 
@@ -21,7 +21,7 @@ export class FileUploadController {
   }
 
   @Post('file')
-  uploadFile() {
+  async uploadFile(): Promise<void> {
     return this.fileUploadService.uploadFile();
   }
 }

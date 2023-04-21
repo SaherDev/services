@@ -14,8 +14,26 @@ export class FileUploadService {
     @Inject(FILES_RETRIEVER) private readonly filesRetriever: IFilesRetriever
   ) {}
 
-  async getFile(key: Readonly<string>): Promise<string> {
-    return this.filesRetriever.get(key);
+  async getFile(key: Readonly<string>): Promise<any> {
+    let getFileResponse;
+    let error: any = null;
+    try {
+      getFileResponse = await this.filesRetriever.get(key);
+    } catch (err) {
+      getFileResponse = null;
+      error = err;
+    }
+
+    if (!getFileResponse || error) {
+      this.logger.error(
+        `getFile >> failed to retrieve file, aborting >> error = ${JSON.stringify(
+          error
+        )}`
+      );
+      throw new InternalServerErrorException('Get File Failed');
+    }
+
+    return getFileResponse;
   }
 
   async uploadFile(): Promise<void> {
@@ -36,5 +54,7 @@ export class FileUploadService {
       );
       throw new InternalServerErrorException('uploadFile Failed');
     }
+
+    return uploadFileResponse;
   }
 }

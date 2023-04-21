@@ -1,8 +1,9 @@
+import { FileMemType, FolderMemType } from './mem-types';
 import { IStorage, StorageObjectType } from '@/models';
 import { drive_v3, google } from 'googleapis';
 
-import { FolderMemType } from './mem-types';
 import { GaxiosResponse } from 'gaxios';
+import { Readable } from 'stream';
 
 export class GoogleDrive implements IStorage {
   private client: drive_v3.Drive;
@@ -39,6 +40,7 @@ export class GoogleDrive implements IStorage {
     }
 
     this.ready = true;
+
     return this.client as T;
   }
   async putObject<T>(
@@ -52,19 +54,40 @@ export class GoogleDrive implements IStorage {
         `fields are missing >>  bucketName = ${bucketName} , key = ${key}`
       );
 
+    let [objectParentId, keySuffix]: [string, string] = ['', ''];
+    let objectPathError: any = null;
+    try {
+      [objectParentId, keySuffix] =
+        await this.createObjectPathAndGetObjectParentIdAndObjectSuffix(
+          bucketName,
+          key
+        );
+    } catch (error) {
+      objectPathError = error;
+      objectParentId = null;
+    }
+
+    if (!objectParentId || !keySuffix || objectPathError)
+      throw new Error(
+        `failed to create object path >> error = ${
+          JSON.stringify(objectPathError) ?? objectPathError
+        }`
+      );
+
     let responseObject: GaxiosResponse<drive_v3.Schema$File> = null;
     let error: any = null;
     try {
       responseObject = await this.client.files.create(
-        this.createParamsResource(bucketName, key, object as Blob)
+        this.createPutParamsResource(objectParentId, keySuffix, object)
       );
     } catch (err: any) {
       error = err;
       responseObject = null;
     }
+
     if (!responseObject || error || !responseObject.data)
       throw new Error(
-        `failed to delete messages >> error = ${JSON.stringify(error)}`
+        `failed to putObject >> error = ${JSON.stringify(error)}`
       );
 
     return responseObject.data as T;
@@ -85,7 +108,7 @@ export class GoogleDrive implements IStorage {
     try {
       responseObject = await this.client.files.get(
         {
-          key,
+          fileId: key,
           alt: 'media',
         },
         { responseType: 'arraybuffer' }
@@ -102,13 +125,14 @@ export class GoogleDrive implements IStorage {
         )}`
       );
     }
+
     return responseObject.data as T;
   }
 
-  private createParamsResource(
+  private createPutParamsResource(
     bucketName: Readonly<string>,
     key: Readonly<string>,
-    object?: Readonly<Blob>
+    object: Readonly<StorageObjectType> | undefined = undefined
   ): drive_v3.Params$Resource$Files$Create {
     const paramsResource: drive_v3.Params$Resource$Files$Create = {
       fields: 'id',
@@ -122,12 +146,80 @@ export class GoogleDrive implements IStorage {
 
     if (object) {
       paramsResource.media = {
-        body: object.stream(),
+        body: this.bufferToStream(object as Buffer),
+        mimeType: 'application/octet-stream',
       };
     } else {
       paramsResource.requestBody.mimeType = FolderMemType;
     }
 
     return paramsResource;
+  }
+
+  private bufferToStream(buffer: Buffer): Readable {
+    const readable = new Readable();
+    readable.push(buffer);
+    readable.push(null);
+    return readable;
+  }
+
+  private async createObjectPathAndGetObjectParentIdAndObjectSuffix(
+    bucket: Readonly<string>,
+    key: Readonly<string>
+  ): Promise<[string, string]> {
+    const pathParts: string[] = key.split('/');
+    if (pathParts.length < 1) return [bucket, key];
+
+    let currentParentId = bucket;
+
+    for (const part of pathParts.slice(0, -1)) {
+      const existingFolderId: string = await this.findFolderByName(
+        currentParentId,
+        part
+      );
+
+      if (existingFolderId) {
+        currentParentId = existingFolderId;
+      } else {
+        const createdFolderId: string = await this.createFolder(
+          currentParentId,
+          part
+        );
+        currentParentId = createdFolderId;
+      }
+    }
+
+    return [currentParentId, pathParts[pathParts.length - 1]];
+  }
+
+  private async createFolder(
+    parentFolderId: string,
+    folderName: string
+  ): Promise<string> {
+    const response = await this.client.files.create(
+      this.createPutParamsResource(parentFolderId, folderName)
+    );
+
+    return response.data.id;
+  }
+
+  private async findFolderByName(
+    parentFolderId: string,
+    folderName: string
+  ): Promise<string | null> {
+    const response = await this.client.files.list({
+      q: `mimeType='${FolderMemType}' and trashed = false and name = '${folderName}' and '${parentFolderId}' in parents`,
+      fields: 'nextPageToken, files(id, name)',
+    });
+
+    if (response.data.files && response.data.files.length > 0) {
+      return response.data.files[0].id;
+    }
+
+    return null;
+  }
+
+  private async streamBuffer(stream): Promise<Buffer> {
+    return Buffer.from(stream);
   }
 }

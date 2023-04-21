@@ -35,6 +35,7 @@
     "fastify": "^4.15.0",
     "fastify-swagger": "^5.2.0",
     "js-yaml": "^4.1.0",
+    "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },

@@ -1,9 +1,8 @@
-import { Serialize } from '@/interceptors';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { MoveFileFileDto } from './dto';
+import { FileDto, MoveFileFileDto } from './dto';
 import { FileUploadService } from './file-upload.service';
-
+import { Serialize } from '@services/common';
 @ApiTags('upload')
 @Controller('upload')
 export class FileUploadController {
@@ -15,12 +14,12 @@ export class FileUploadController {
   }
 
   @Post('move-file')
-  @Serialize(MoveFileFileDto)
+  @Serialize(FileDto)
   //ONLY WITH @EXPOSE()
   async uploadFileToPath(
     @Body() moveFileDto: MoveFileFileDto
-  ): Promise<MoveFileFileDto> {
-    return { filePath: ',dd,.,d.', fileId: 'ldlkd' };
+  ): Promise<FileDto> {
+    return { filePath: 'newPath', fileId: 'file-id' };
   }
 
   @Post('file')

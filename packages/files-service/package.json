@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-fastify": "^9.4.0",
     "@nestjs/swagger": "^6.3.0",
+    "@services/common": "1.0.0",
     "@services/utilities-queue": "1.1.0",
     "@services/utilities-storage": "1.0.1",
     "class-transformer": "^0.5.1",

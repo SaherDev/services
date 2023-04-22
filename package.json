@@ -9,7 +9,8 @@
   "scripts": {
     "build": "yarn workspaces foreach -pt run build",
     "build:lerna": "lerna run build --parallel",
-    "version": "lerna version"
+    "version": "lerna version",
+    "add:package": "yarn workspace @services/package-name add typescript --dev"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

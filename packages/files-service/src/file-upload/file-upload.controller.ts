@@ -2,9 +2,10 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FileDto, MoveFileFileDto } from './dto';
 import { FileUploadService } from './file-upload.service';
-import { Serialize } from '@services/common';
+import { AuthenticationRequired, Serialize } from '@services/common';
 @ApiTags('upload')
 @Controller('upload')
+@AuthenticationRequired()
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 

@@ -1,1 +1,1 @@
-export const guard = '';
+export * from './authentication.guard';

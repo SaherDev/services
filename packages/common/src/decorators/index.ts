@@ -1,1 +1,1 @@
-export const decorator = '';
+export * from './authentication-required.decorator';

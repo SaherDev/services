@@ -7,9 +7,9 @@
     "packages/utilities/*"
   ],
   "scripts": {
-    "build": "lerna run build --parallel",
-    "version": "lerna version",
-    "remove:package": " remove Manually and run > lerna bootstrap --scope @services/package-name --no-ci --force-local"
+    "build": "yarn workspaces foreach -pt run build",
+    "build:lerna": "lerna run build --parallel",
+    "version": "lerna version"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

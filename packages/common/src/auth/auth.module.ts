@@ -1,17 +1,17 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
 @Module({})
-export class AuthModule {
+export class CommonAuthModule {
   static forRoot(): DynamicModule {
     return {
-      module: AuthModule,
+      module: CommonAuthModule,
       providers: [
         {
-          provide: AuthModule,
-          useClass: AuthModule,
+          provide: CommonAuthModule,
+          useClass: CommonAuthModule,
         },
       ],
-      exports: [AuthModule],
+      exports: [CommonAuthModule],
     };
   }
 }

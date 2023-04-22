@@ -1,1 +1,2 @@
-export const ANY = '';
+export const USERS_RETRIEVER = 'USERS-RETRIEVER';
+export const ROLES_RETRIEVER = 'ROLES-RETRIEVER';

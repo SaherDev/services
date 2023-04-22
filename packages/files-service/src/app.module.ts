@@ -1,4 +1,4 @@
-import { AuthModule, YamlConfigModule } from '@services/common';
+import { CommonAuthModule, YamlConfigModule } from '@services/common';
 import {
   ENV_COMMON_CONFIG_FILE_PATH,
   ENV_CONFIG_FILE_PATH,
@@ -20,7 +20,7 @@ import { Module } from '@nestjs/common';
         cache: true,
       },
     }),
-    AuthModule.forRoot(),
+    CommonAuthModule.forRoot(),
     FileUploadModule,
   ],
   controllers: [AppController],

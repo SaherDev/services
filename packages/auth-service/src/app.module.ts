@@ -1,4 +1,5 @@
-import { AuthModule, YamlConfigModule } from '@services/common';
+import { CommonAuthModule, YamlConfigModule } from '@services/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   ENV_AUTH_SERVICE_CONFIG_FILE_PATH,
   ENV_COMMON_CONFIG_FILE_PATH,
@@ -8,6 +9,7 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -22,7 +24,14 @@ import { Module } from '@nestjs/common';
         cache: true,
       },
     }),
-    AuthModule.forRoot(),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('environment.database.mongoConnectionString'),
+      }),
+      inject: [ConfigService],
+    }),
+    CommonAuthModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

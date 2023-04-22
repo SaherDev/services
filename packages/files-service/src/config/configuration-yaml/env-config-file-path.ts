@@ -1,1 +1,1 @@
-export const ENV_CONFIG_FILE_PATH = process.env.FILES_SERVICE_FILE_PATH;
+export const ENV_CONFIG_FILE_PATH = process.env.FILES_SERVICE_CONFIG_FILE_PATH;

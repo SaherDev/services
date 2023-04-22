@@ -8,7 +8,7 @@
           "name": "@services/files-service",
           "commands": [
             "cd packages/files-service",
-            "export FILES_SERVICE_FILE_PATH=/Users/saherheib/dev/repos/config-services/files-service/files-service.config.yaml",
+            "export FILES_SERVICE_CONFIG_FILE_PATH=/Users/saherheib/dev/repos/config-services/files-service/files-service.config.yaml",
             "yarn start:dev"
           ]
         }

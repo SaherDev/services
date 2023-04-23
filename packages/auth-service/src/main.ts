@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { getLogLevels } from '@services/common';
+import secureSession from '@fastify/secure-session';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -30,6 +31,18 @@ async function bootstrap() {
   app.useLogger(
     getLogLevels(configService.get<string>('environment.type') === 'production')
   );
+
+  await app.register(secureSession, {
+    secret: configService.get<string>('common.auth.sessionWrapperSecret'),
+    salt: configService.get<string>('common.auth.sessionWrapperSalt'),
+    cookie: {
+      maxAge: configService.get<string>('common.auth.sessionMaxAge'),
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    },
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

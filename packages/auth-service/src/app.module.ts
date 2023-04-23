@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RoleModule } from './role';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     CommonAuthModule.forRoot(),
     AuthModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

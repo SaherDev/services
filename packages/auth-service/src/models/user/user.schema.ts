@@ -4,6 +4,7 @@ import { Document } from 'mongoose';
 import { IUser } from './user.interface';
 
 @Schema({
+  collection: 'user',
   autoCreate: false,
   autoIndex: false,
   timestamps: { createdAt: 'createdAt', updatedAt: 'lastUpdateAt' },

@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IRole } from './role.interface';
 
 @Schema({
+  collection: 'role',
   autoCreate: true,
   autoIndex: false,
   timestamps: { createdAt: 'createdAt', updatedAt: 'lastUpdateAt' },
@@ -10,6 +11,9 @@ import { IRole } from './role.interface';
 export class MongoRole implements IRole {
   @Prop()
   id: string;
+
+  @Prop()
+  name: string;
 
   @Prop()
   permissions: string[];

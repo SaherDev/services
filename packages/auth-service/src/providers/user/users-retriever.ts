@@ -11,6 +11,35 @@ export class UsersRetriever implements IUsersRetriever {
     private readonly userRepository: IUserRepository
   ) {}
 
+  async updateOne(
+    query: Partial<IUser>,
+    value: Partial<IUser>
+  ): Promise<IUser> {
+    let response: IUser;
+    let error: any;
+
+    try {
+      if (value.id) delete value.id;
+
+      response = await this.userRepository.updateOne(
+        {
+          filter: query,
+        },
+        value
+      );
+    } catch (err) {
+      error = err;
+    }
+
+    if (!response || error) {
+      throw new Error(
+        `updateOne >> updating role failed >> error = ${JSON.stringify(error)}`
+      );
+    }
+
+    return response;
+  }
+
   async findUser(userName: string): Promise<IUser> {
     let response: IUser;
     let error: any;

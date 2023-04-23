@@ -1,16 +1,23 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from '@services/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, UserDto } from './dto';
+import {
+  associateRoleWithUserDto,
+  CreateUserDto,
+  SignInDto,
+  UserDto,
+} from './dto';
 
 @Controller('auth')
+@ApiTags('auth')
+@Serialize(UserDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  @Serialize(UserDto)
-  signUp(@Body() user: CreateUserDto) {
+  signUp(@Body() user: CreateUserDto): Promise<UserDto> {
     return this.authService.signUp(
       user.userName,
       user.password,
@@ -19,7 +26,16 @@ export class AuthController {
     );
   }
 
-  @Post('log-in')
-  @Serialize(UserDto)
-  logIn() {}
+  @Post('signin')
+  signIn(@Body() user: SignInDto): Promise<UserDto> {
+    return this.authService.signIn(user.userName, user.password);
+  }
+
+  @Post('user/:username/role')
+  associateRoleWithUser(
+    @Param('username') userName: string,
+    @Body() body: associateRoleWithUserDto
+  ): Promise<UserDto> {
+    return this.authService.updateUser(userName, body);
+  }
 }

@@ -10,13 +10,13 @@ export class RolesRetriever implements IRolesRetriever {
     @Inject(ROLES_REPOSITORY) private readonly rolesRepository: IRolesRepository
   ) {}
 
-  async findRole(id: string): Promise<IRole> {
+  async findRole(value: Partial<IRole>): Promise<IRole> {
     let response: IRole;
     let error: any;
 
     try {
       response = await this.rolesRepository.findOne({
-        filter: { id },
+        filter: value,
       });
     } catch (err) {
       error = err;
@@ -43,6 +43,35 @@ export class RolesRetriever implements IRolesRetriever {
     if (!response || error) {
       throw new Error(
         `findRole >> find roles failed >> error = ${JSON.stringify(error)}`
+      );
+    }
+
+    return response;
+  }
+
+  async updateOne(
+    query: Partial<IRole>,
+    value: Partial<IRole>
+  ): Promise<IRole> {
+    let response: IRole;
+    let error: any;
+
+    try {
+      if (value.id) delete value.id;
+
+      response = await this.rolesRepository.updateOne(
+        {
+          filter: query,
+        },
+        value
+      );
+    } catch (err) {
+      error = err;
+    }
+
+    if (!response || error) {
+      throw new Error(
+        `updateOne >> updating role failed >> error = ${JSON.stringify(error)}`
       );
     }
 

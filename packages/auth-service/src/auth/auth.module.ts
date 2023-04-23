@@ -1,11 +1,7 @@
-import { MongoRole, MongoUser, RoleSchema, UserSchema } from '@/models';
+import { MongoUser, UserSchema } from '@/models';
 import {
   PASSWORD_HASHER,
   PasswordHasher,
-  ROLES_REPOSITORY,
-  ROLES_RETRIEVER,
-  RolesRepository,
-  RolesRetriever,
   USERS_REPOSITORY,
   USERS_RETRIEVER,
   UserRepository,
@@ -24,10 +20,6 @@ import { MongooseModule } from '@nestjs/mongoose';
         name: MongoUser.name,
         schema: UserSchema,
       },
-      {
-        name: MongoRole.name,
-        schema: RoleSchema,
-      },
     ]),
   ],
   providers: [
@@ -35,18 +27,12 @@ import { MongooseModule } from '@nestjs/mongoose';
       provide: USERS_RETRIEVER,
       useClass: UsersRetriever,
     },
-    {
-      provide: ROLES_RETRIEVER,
-      useClass: RolesRetriever,
-    },
+
     {
       provide: USERS_REPOSITORY,
       useClass: UserRepository,
     },
-    {
-      provide: ROLES_REPOSITORY,
-      useClass: RolesRepository,
-    },
+
     {
       provide: PASSWORD_HASHER,
       useClass: PasswordHasher,

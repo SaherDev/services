@@ -10,6 +10,21 @@ export class UserRepository implements IUserRepository {
   constructor(
     @InjectModel(MongoUser.name) private rolesModel: Model<UserDocument>
   ) {}
+
+  async updateOne(
+    query: IDatabaseQuey<IUser>,
+    value: Partial<IUser>
+  ): Promise<IUser> {
+    const response = await this.rolesModel.findOneAndUpdate(
+      query.filter,
+      value,
+      {
+        new: true,
+      }
+    );
+
+    return this.dbToObject(response);
+  }
   async findOne(value: IDatabaseQuey<IUser>): Promise<IUser> {
     const response = await this.rolesModel.findOne(value.filter);
 

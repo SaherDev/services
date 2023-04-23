@@ -1,1 +1,3 @@
-export const ANY_NAME = '';
+export const SESSION_DECODER = 'SESSION-DECODER';
+export const JWT_DECODER = 'JWT-DECODER';
+export const SESSION_PROVIDER = 'SESSION-PROVIDER';

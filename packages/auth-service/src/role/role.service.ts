@@ -1,4 +1,4 @@
-import { IRole, Role } from '@/models';
+import { IRole } from '@/models';
 import { IRolesRetriever, ROLES_RETRIEVER } from '@/providers';
 import {
   BadRequestException,

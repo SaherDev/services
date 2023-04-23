@@ -1,11 +1,10 @@
-import { FILES_RETRIEVER } from '@/config';
 import {
   Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { IFilesRetriever } from '../providers/files-retriever';
+import { IFilesRetriever, FILES_RETRIEVER } from '@/providers';
 
 @Injectable()
 export class FileUploadService {

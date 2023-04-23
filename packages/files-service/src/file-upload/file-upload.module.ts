@@ -1,10 +1,9 @@
-import { GoogleDrive, S3, STORAGE } from '@services/utilities-storage';
+import { FILES_RETRIEVER, FilesRetriever } from '@/providers';
 import { QUEUE, Sqs } from '@services/utilities-queue';
+import { S3, STORAGE } from '@services/utilities-storage';
 
-import { FILES_RETRIEVER } from '@/config';
 import { FileUploadController } from './file-upload.controller';
 import { FileUploadService } from './file-upload.service';
-import { FilesRetriever } from '@/providers';
 import { Module } from '@nestjs/common';
 
 @Module({

@@ -29,7 +29,7 @@ export class MongoUser implements IUser {
     unique: true,
     required: true,
   })
-  email: string;
+  userName: string;
 
   @Prop({
     required: true,

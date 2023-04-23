@@ -8,6 +8,7 @@ import {
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -32,6 +33,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       inject: [ConfigService],
     }),
     CommonAuthModule.forRoot(),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

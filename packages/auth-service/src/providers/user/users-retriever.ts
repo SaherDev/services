@@ -1,23 +1,29 @@
 import { IUser } from '@/models';
 import { IUserRepository } from './user.repository.interface';
 import { IUsersRetriever } from './users-retriever.interface';
+import { Inject, Injectable } from '@nestjs/common';
+import { USERS_REPOSITORY } from '../dependency-names';
 
+@Injectable()
 export class UsersRetriever implements IUsersRetriever {
-  constructor(private readonly rolesRepository: IUserRepository) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly userRepository: IUserRepository
+  ) {}
 
-  async findUser(id: string): Promise<IUser> {
+  async findUser(userName: string): Promise<IUser> {
     let response: IUser;
     let error: any;
 
     try {
-      response = await this.rolesRepository.findOne({
-        filter: { id },
+      response = await this.userRepository.findOne({
+        filter: { userName },
       });
     } catch (err) {
       error = err;
     }
 
-    if (!response || error) {
+    if (error) {
       throw new Error(
         `findRole >> find roles failed >> error = ${JSON.stringify(error)}`
       );
@@ -30,7 +36,7 @@ export class UsersRetriever implements IUsersRetriever {
     let error: any;
 
     try {
-      response = await this.rolesRepository.store(value);
+      response = await this.userRepository.store(value);
     } catch (err) {
       error = err;
     }

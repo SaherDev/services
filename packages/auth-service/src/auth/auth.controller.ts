@@ -1,7 +1,7 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Serialize } from '@services/common';
+import { AuthenticationRequired, Serialize } from '@services/common';
 import { AuthService } from './auth.service';
 import {
   associateRoleWithUserDto,
@@ -32,6 +32,7 @@ export class AuthController {
   }
 
   @Post('user/:username/role')
+  @AuthenticationRequired()
   associateRoleWithUser(
     @Param('username') userName: string,
     @Body() body: associateRoleWithUserDto

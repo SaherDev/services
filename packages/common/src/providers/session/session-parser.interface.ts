@@ -1,3 +1,6 @@
+import { ISessionCookieValue, IUserSession } from '@services/models';
+
 export interface ISessionDecoder {
-  // parse(): SessionCookieValue;
+  generateSession(user: IUserSession): Promise<boolean>;
+  decodeSession(): Promise<ISessionCookieValue>;
 }

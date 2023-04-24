@@ -13,7 +13,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { uuid } from '@services/common';
+import { SESSION_DECODER, uuid, ISessionDecoder } from '@services/common';
+import { UserSession } from '@services/models';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,8 @@ export class AuthService {
 
   constructor(
     @Inject(USERS_RETRIEVER) private readonly usersRetriever: IUsersRetriever,
-    @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher
+    @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
+    @Inject(SESSION_DECODER) private readonly sessionDecoder: ISessionDecoder
   ) {}
 
   async signUp(
@@ -180,11 +182,26 @@ export class AuthService {
 
     if (!verifyPassword) throw new BadRequestException('bad password');
 
+    const sessionSetResponse: boolean = await this.generateUserSession(
+      existingUserResponse
+    );
+
+    if (!sessionSetResponse) {
+      this.logger.debug('signIn >> failed to set session, skipping');
+    }
+
     return existingUserResponse;
   }
 
   private async findUser(userName: Readonly<string>): Promise<IUser> {
     return await this.usersRetriever.findUser(userName);
+  }
+
+  private async generateUserSession(user: Readonly<IUser>): Promise<boolean> {
+    const fullName: string = `${user.firstName} ${user.lastName}`;
+    return await this.sessionDecoder.generateSession(
+      new UserSession(user.id, fullName, [])
+    );
   }
 
   private validateUserFields(

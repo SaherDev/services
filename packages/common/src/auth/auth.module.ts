@@ -18,10 +18,6 @@ export class CommonAuthModule {
       module: CommonAuthModule,
       providers: [
         {
-          provide: CommonAuthModule,
-          useClass: CommonAuthModule,
-        },
-        {
           provide: SESSION_DECODER,
           useClass: SessionDecoder,
         },
@@ -35,7 +31,7 @@ export class CommonAuthModule {
         },
         JwtService,
       ],
-      exports: [CommonAuthModule],
+      exports: [SESSION_DECODER, JWT_DECODER, SESSION_PROVIDER],
     };
   }
 }

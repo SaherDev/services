@@ -23,10 +23,15 @@ export class JwtDecoder implements IJwtDecoder {
     let error: any;
 
     try {
-      response = await this.jwtService.signAsync(payload, {
-        secret,
-        expiresIn: maxAge,
-      });
+      response = await this.jwtService.signAsync(
+        {
+          object: payload,
+        },
+        {
+          secret,
+          expiresIn: maxAge,
+        }
+      );
     } catch (err) {
       error = err;
     }
@@ -43,7 +48,7 @@ export class JwtDecoder implements IJwtDecoder {
     let error: any;
 
     try {
-      response = await this.jwtService.verify(token, {
+      response = await this.jwtService.verifyAsync(token, {
         secret,
         maxAge,
       });

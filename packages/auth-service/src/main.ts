@@ -39,7 +39,7 @@ async function bootstrap() {
       maxAge: configService.get<string>('common.auth.sessionMaxAge'),
       path: '/',
       httpOnly: true,
-      secure: true,
+      secure: configService.get<string>('environment.type') === 'production',
       sameSite: 'lax',
     },
   });

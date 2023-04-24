@@ -1,7 +1,7 @@
 import { UseGuards, applyDecorators } from '@nestjs/common';
 
-import { AuthorizationGuard } from '../guards';
+import { AuthenticationGuard } from '../guards';
 
 export const AuthenticationRequired = () => {
-  return applyDecorators(UseGuards(AuthorizationGuard));
+  return applyDecorators(UseGuards(AuthenticationGuard));
 };

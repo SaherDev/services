@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileDto, MoveFileFileDto } from './dto';
 import { FileUploadService } from './file-upload.service';
-import { AuthenticationRequired, Serialize } from '@services/common';
+import { FormData, FormDatGuard, Serialize, IFormData } from '@services/common';
+
 @ApiTags('upload')
 @Controller('upload')
-@AuthenticationRequired()
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
@@ -17,14 +17,28 @@ export class FileUploadController {
   @Post('move-file')
   @Serialize(FileDto)
   //ONLY WITH @EXPOSE()
-  async uploadFileToPath(
-    @Body() moveFileDto: MoveFileFileDto
-  ): Promise<FileDto> {
+  async moveFile(@Body() moveFileDto: MoveFileFileDto): Promise<FileDto> {
     return { filePath: 'newPath', fileId: 'file-id' };
   }
 
   @Post('file')
-  async uploadFile(): Promise<void> {
-    return this.fileUploadService.uploadFile();
+  @ApiConsumes('multipart/form-data')
+  //TODO:MOVE DECO
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+        },
+        info: { type: 'string' },
+      },
+    },
+  })
+  @UseGuards(FormDatGuard)
+  @Serialize(FileDto)
+  async uploadFile(@FormData() form: IFormData): Promise<void> {
+    return this.fileUploadService.uploadFile(form);
   }
 }

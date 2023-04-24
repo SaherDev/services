@@ -1,3 +1,4 @@
+import { fileUuid } from './../../../../common/src/providers/uuid/file-uuid';
 import { ConfigService } from '@nestjs/config';
 import { IFilesRetriever } from './files-retriever.interface';
 import { Inject, Injectable } from '@nestjs/common';
@@ -28,12 +29,10 @@ export class FilesRetriever implements IFilesRetriever {
     return await this.storageUtil.getObject(this.bucket, key);
   }
 
-  async set(Key: string, body: string): Promise<void> {
-    return await this.storageUtil.putObject(
-      this.bucket,
-      'test.png',
-      this.readTestFile()
-    );
+  async set(Key: string, buffer: Buffer): Promise<string> {
+    let fileId = fileUuid(Key);
+    await this.storageUtil.putObject(this.bucket, fileId, buffer);
+    return fileId;
   }
 
   private initializeStorage() {

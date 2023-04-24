@@ -9,6 +9,7 @@
     "build": "yarn tsc --build"
   },
   "dependencies": {
+    "@fastify/multipart": "^7.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",

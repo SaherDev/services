@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { IFilesRetriever, FILES_RETRIEVER } from '@/providers';
+import { IFormData } from '@services/common';
 
 @Injectable()
 export class FileUploadService {
@@ -35,11 +37,19 @@ export class FileUploadService {
     return getFileResponse;
   }
 
-  async uploadFile(): Promise<void> {
+  async uploadFile(form: IFormData): Promise<void> {
+    if (!form.files || !form.files.length) {
+      this.logger.error(`uploadFile >>  field missing, aborting.`);
+      throw new BadRequestException('files missing');
+    }
+
     let uploadFileResponse;
     let error: any = null;
     try {
-      uploadFileResponse = await this.filesRetriever.set('', '');
+      uploadFileResponse = await this.filesRetriever.set(
+        form.files[0].filename,
+        await form.files[0].toBuffer()
+      );
     } catch (err) {
       uploadFileResponse = null;
       error = err;

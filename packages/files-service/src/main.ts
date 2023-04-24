@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { getLogLevels } from '@services/common';
+import multiPart from '@fastify/multipart';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -40,6 +41,12 @@ async function bootstrap() {
         configService.get<string>('environment.type') !== 'production',
     })
   );
+
+  await app.register(multiPart, {
+    limits: {
+      fileSize: 4984849849,
+    },
+  });
 
   await app
     .listen(configService.get<number>('environment.port'), '0.0.0.0')

@@ -6,7 +6,9 @@ import {
   AuthenticationRequired,
   AuthorizationRequired,
   Serialize,
+  UserSession,
 } from '@services/common';
+import { IUserSession } from '@services/models';
 import { AuthService } from './auth.service';
 import {
   associateRoleWithUserDto,
@@ -49,5 +51,10 @@ export class AuthController {
   @Post('refresh')
   refreshToken(): Promise<UserDto> {
     return this.authService.refreshToken();
+  }
+  @Post('me')
+  @AuthenticationRequired()
+  async me(@UserSession() user: IUserSession): Promise<any> {
+    return user;
   }
 }

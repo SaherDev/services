@@ -40,13 +40,13 @@ export class UsersRetriever implements IUsersRetriever {
     return response;
   }
 
-  async findUser(userName: string): Promise<IUser> {
+  async findUser(value: Partial<IUser>): Promise<IUser> {
     let response: IUser;
     let error: any;
 
     try {
       response = await this.userRepository.findOne({
-        filter: { userName },
+        filter: value,
       });
     } catch (err) {
       error = err;

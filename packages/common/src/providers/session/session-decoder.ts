@@ -26,6 +26,27 @@ export class SessionDecoder implements ISessionDecoder {
     this.generateConfigs();
   }
 
+  async decodeRefreshToken(): Promise<IRefreshToken> {
+    const session: ISessionCookieValue = this.sessionProvider.get(
+      this.sessionKeyPrefix
+    );
+
+    if (!session) throw new Error('session missing');
+
+    let decodeRefreshToken: IRefreshToken;
+    try {
+      decodeRefreshToken = await this.jwtDecoder.verify<IRefreshToken>(
+        session.refreshToken,
+        TokenType.RefreshToken
+      );
+    } catch (error) {}
+
+    if (!decodeRefreshToken || !decodeRefreshToken.object.id)
+      throw new Error('parsing failed');
+
+    return decodeRefreshToken;
+  }
+
   async decodeSession(): Promise<ISessionCookieValue> {
     const session: ISessionCookieValue = this.sessionProvider.get(
       this.sessionKeyPrefix
@@ -65,19 +86,25 @@ export class SessionDecoder implements ISessionDecoder {
     );
   }
   async generateSession(user: IUserSession): Promise<boolean> {
-    let accessToken: string = await this.jwtDecoder.sign(
-      user,
-      TokenType.AccessToken
-    );
+    let accessToken: string;
+    let refreshToken: string;
+    try {
+      accessToken = await this.jwtDecoder.sign(user, TokenType.AccessToken);
+    } catch (error) {}
 
-    const refreshTokenPayload: IRefreshTokenPayload = {
-      id: user.id,
-      version: 1,
-    };
-    let refreshToken: string = await this.jwtDecoder.sign(
-      refreshTokenPayload,
-      TokenType.RefreshToken
-    );
+    try {
+      const refreshTokenPayload: IRefreshTokenPayload = {
+        id: user.id,
+        version: 1,
+      };
+      refreshToken = await this.jwtDecoder.sign(
+        refreshTokenPayload,
+        TokenType.RefreshToken
+      );
+    } catch (error) {}
+
+    if (!accessToken || !refreshToken)
+      throw new Error('session generate failed');
 
     const sessionValue = new SessionCookieValue(
       this.sessionKeyPrefix,

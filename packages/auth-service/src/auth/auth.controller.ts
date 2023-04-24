@@ -45,4 +45,9 @@ export class AuthController {
   ): Promise<UserDto> {
     return this.authService.updateUser(userName, body);
   }
+
+  @Post('refresh')
+  refreshToken(): Promise<UserDto> {
+    return this.authService.refreshToken();
+  }
 }

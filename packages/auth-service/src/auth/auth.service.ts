@@ -14,9 +14,10 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SESSION_DECODER, uuid, ISessionDecoder } from '@services/common';
-import { UserSession } from '@services/models';
+import { IRefreshToken, UserSession } from '@services/models';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,9 @@ export class AuthService {
     let existingUserResponseError: any = null;
 
     try {
-      existingUserResponse = await this.findUser(userName);
+      existingUserResponse = await this.findUser({
+        userName,
+      });
     } catch (error) {
       existingUserResponseError = error;
     }
@@ -102,7 +105,9 @@ export class AuthService {
     let existingUserResponseError: any = null;
 
     try {
-      existingUserResponse = await this.findUser(userName);
+      existingUserResponse = await this.findUser({
+        userName,
+      });
     } catch (error) {
       existingUserResponseError = error;
     }
@@ -160,7 +165,9 @@ export class AuthService {
     let existingUserResponseError: any = null;
 
     try {
-      existingUserResponse = await this.findUser(userName);
+      existingUserResponse = await this.findUser({
+        userName,
+      });
     } catch (error) {
       existingUserResponseError = error;
     }
@@ -183,7 +190,7 @@ export class AuthService {
       existingUserResponse.password
     );
 
-    if (!verifyPassword) throw new BadRequestException('bad password');
+    if (!verifyPassword) throw new UnauthorizedException('Unauthorized');
 
     const sessionSetResponse: boolean = await this.generateUserSession(
       existingUserResponse
@@ -196,8 +203,8 @@ export class AuthService {
     return existingUserResponse;
   }
 
-  private async findUser(userName: Readonly<string>): Promise<IUser> {
-    return await this.usersRetriever.findUser(userName);
+  private async findUser(user: Partial<IUser>): Promise<IUser> {
+    return await this.usersRetriever.findUser(user);
   }
 
   private async generateUserSession(user: Readonly<IUser>): Promise<boolean> {
@@ -231,6 +238,59 @@ export class AuthService {
     }
 
     return [...new Set(response.map((role) => role.permissions).flat())];
+  }
+
+  async refreshToken(): Promise<IUser> {
+    let refreshToken: IRefreshToken;
+    let refreshTokenError: any;
+
+    try {
+      refreshToken = await this.sessionDecoder.decodeRefreshToken();
+    } catch (error) {
+      refreshTokenError;
+    }
+
+    if (
+      refreshTokenError ||
+      !refreshToken ||
+      !refreshToken.object ||
+      !refreshToken.object.id
+    ) {
+      this.logger.debug(
+        `refreshToken >> failed to refresh token, aborting. error = ${JSON.stringify(
+          refreshTokenError
+        )}`
+      );
+      throw new UnauthorizedException('unauthorized');
+    }
+
+    let user: IUser;
+    let findUserError: any;
+    try {
+      user = await this.findUser({
+        id: refreshToken.object.id,
+      });
+    } catch (error) {
+      findUserError;
+    }
+
+    if (findUserError || !user) {
+      this.logger.debug(
+        `refreshToken >> error while retrieving the user, aborting. error = ${JSON.stringify(
+          refreshTokenError
+        )}`
+      );
+      throw new UnauthorizedException('unauthorized');
+    }
+
+    const sessionSetResponse: boolean = await this.generateUserSession(user);
+
+    if (!sessionSetResponse) {
+      this.logger.error('signIn >> failed to set session, aborting');
+      throw new UnauthorizedException('unauthorized');
+    }
+
+    return user;
   }
 
   private validateUserFields(

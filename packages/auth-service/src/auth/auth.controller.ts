@@ -52,9 +52,9 @@ export class AuthController {
   refreshToken(): Promise<UserDto> {
     return this.authService.refreshToken();
   }
-  @Post('me')
-  @AuthenticationRequired()
-  async me(@UserSession() user: IUserSession): Promise<any> {
-    return user;
-  }
+  // @Post('me')
+  // @AuthenticationRequired()
+  // async me(@UserSession() user: IUserSession): Promise<any> {
+  //   return user;
+  // }
 }

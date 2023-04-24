@@ -1,8 +1,10 @@
-import { IUser } from '@/models';
+import { IRole, IUser } from '@/models';
 import {
   IPasswordHasher,
+  IRolesRetriever,
   IUsersRetriever,
   PASSWORD_HASHER,
+  ROLES_RETRIEVER,
   USERS_RETRIEVER,
 } from '@/providers';
 import {
@@ -23,7 +25,8 @@ export class AuthService {
   constructor(
     @Inject(USERS_RETRIEVER) private readonly usersRetriever: IUsersRetriever,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
-    @Inject(SESSION_DECODER) private readonly sessionDecoder: ISessionDecoder
+    @Inject(SESSION_DECODER) private readonly sessionDecoder: ISessionDecoder,
+    @Inject(ROLES_RETRIEVER) private readonly rolesRetriever: IRolesRetriever
   ) {}
 
   async signUp(
@@ -187,7 +190,7 @@ export class AuthService {
     );
 
     if (!sessionSetResponse) {
-      this.logger.debug('signIn >> failed to set session, skipping');
+      this.logger.warn('signIn >> failed to set session, skipping');
     }
 
     return existingUserResponse;
@@ -198,10 +201,36 @@ export class AuthService {
   }
 
   private async generateUserSession(user: Readonly<IUser>): Promise<boolean> {
+    const permissions = await this.prepareUserPermission(user);
     const fullName: string = `${user.firstName} ${user.lastName}`;
     return await this.sessionDecoder.generateSession(
-      new UserSession(user.id, fullName, [])
+      new UserSession(user.id, fullName, permissions)
     );
+  }
+
+  private async prepareUserPermission(
+    user: Readonly<IUser>
+  ): Promise<string[]> {
+    if (!user.roles || !user.roles.length) return [];
+
+    let response: IRole[];
+    let error: any;
+
+    try {
+      response = await this.rolesRetriever.findRoles(user.roles);
+    } catch (err) {
+      error = err;
+    }
+
+    if (!response || error) {
+      this.logger.warn(
+        `prepareUserPermission >> failed to retrieve roles, skipping >>  error = ${JSON.stringify(
+          error
+        )}`
+      );
+    }
+
+    return [...new Set(response.map((role) => role.permissions).flat())];
   }
 
   private validateUserFields(

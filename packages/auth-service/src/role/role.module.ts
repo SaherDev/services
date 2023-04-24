@@ -33,6 +33,6 @@ import { RoleService } from './role.service';
     },
     RoleService,
   ],
-  exports: [RoleService],
+  exports: [RoleService, ROLES_RETRIEVER],
 })
 export class RoleModule {}

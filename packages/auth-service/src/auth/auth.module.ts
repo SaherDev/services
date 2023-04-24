@@ -2,6 +2,7 @@ import { MongoUser, UserSchema } from '@/models';
 import {
   PASSWORD_HASHER,
   PasswordHasher,
+  RolesRetriever,
   USERS_REPOSITORY,
   USERS_RETRIEVER,
   UserRepository,
@@ -12,6 +13,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RoleModule } from '@/role';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         schema: UserSchema,
       },
     ]),
+    RoleModule,
   ],
   providers: [
     {

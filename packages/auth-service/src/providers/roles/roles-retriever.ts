@@ -9,6 +9,26 @@ export class RolesRetriever implements IRolesRetriever {
   constructor(
     @Inject(ROLES_REPOSITORY) private readonly rolesRepository: IRolesRepository
   ) {}
+  async findRoles(ides: string[]): Promise<IRole[]> {
+    let response: IRole[];
+    let error: any;
+
+    try {
+      response = await this.rolesRepository.findMany({
+        id: ides,
+      });
+    } catch (err) {
+      error = err;
+    }
+
+    if (!response || error) {
+      throw new Error(
+        `findRoles >> find roles failed >> error = ${JSON.stringify(error)}`
+      );
+    }
+
+    return response;
+  }
 
   async findRole(value: Partial<IRole>): Promise<IRole> {
     let response: IRole;

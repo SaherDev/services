@@ -6,8 +6,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { ISessionCookieValue } from '@services/models';
-import { FastifyRequest } from 'fastify';
+import {
+  IAccessToken,
+  ISessionCookieValue,
+  UserSession,
+} from '@services/models';
 import { ISessionDecoder, SESSION_DECODER } from '../providers';
 
 @Injectable()
@@ -34,6 +37,18 @@ export class AuthenticationGuard implements CanActivate {
     )
       throw new UnauthorizedException('unauthorized');
 
+    const accessToken = decodedSession.accessToken as IAccessToken;
+
+    if (!accessToken || !accessToken.object)
+      throw new UnauthorizedException('unauthorized');
+
+    const userSession: UserSession = accessToken.object;
+
+    if (!userSession || !userSession.id)
+      throw new UnauthorizedException('unauthorized');
+
+    const request = context.switchToHttp().getRequest();
+    request['userSession'] = userSession;
     return true;
   }
 }

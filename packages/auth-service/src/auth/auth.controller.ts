@@ -1,7 +1,12 @@
+import { UserPermission } from '@/models';
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { AuthenticationRequired, Serialize } from '@services/common';
+import {
+  AuthenticationRequired,
+  AuthorizationRequired,
+  Serialize,
+} from '@services/common';
 import { AuthService } from './auth.service';
 import {
   associateRoleWithUserDto,
@@ -33,6 +38,7 @@ export class AuthController {
 
   @Post('user/:username/role')
   @AuthenticationRequired()
+  @AuthorizationRequired([UserPermission.Update])
   associateRoleWithUser(
     @Param('username') userName: string,
     @Body() body: associateRoleWithUserDto

@@ -37,7 +37,7 @@ export class FileUploadService {
     return getFileResponse;
   }
 
-  async uploadFile(form: IFormData): Promise<void> {
+  async uploadFile(form: IFormData): Promise<string> {
     if (!form.files || !form.files.length) {
       this.logger.error(`uploadFile >>  field missing, aborting.`);
       throw new BadRequestException('files missing');

@@ -37,8 +37,7 @@ export class FileUploadController {
     },
   })
   @UseGuards(FormDatGuard)
-  @Serialize(FileDto)
-  async uploadFile(@FormData() form: IFormData): Promise<void> {
+  async uploadFile(@FormData() form: IFormData): Promise<string> {
     return this.fileUploadService.uploadFile(form);
   }
 }

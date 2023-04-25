@@ -17,7 +17,7 @@ declare module 'fastify' {
 }
 
 @Injectable()
-export class FormDatGuard implements CanActivate {
+export class FormDataGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<FastifyRequest>();
     const isMultipart = req.isMultipart();

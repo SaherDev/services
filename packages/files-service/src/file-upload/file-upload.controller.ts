@@ -1,8 +1,14 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileDto, MoveFileFileDto } from './dto';
 import { FileUploadService } from './file-upload.service';
-import { FormData, FormDatGuard, Serialize, IFormData } from '@services/common';
+import {
+  FormData,
+  FormDataGuard,
+  Serialize,
+  IFormData,
+  ApiFileUpload,
+} from '@services/common';
 
 @ApiTags('upload')
 @Controller('upload')
@@ -23,20 +29,8 @@ export class FileUploadController {
 
   @Post('file')
   @ApiConsumes('multipart/form-data')
-  //TODO:MOVE DECO
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        files: {
-          type: 'array',
-          items: { type: 'string', format: 'binary' },
-        },
-        info: { type: 'string' },
-      },
-    },
-  })
-  @UseGuards(FormDatGuard)
+  @UseGuards(FormDataGuard)
+  @ApiFileUpload()
   async uploadFile(@FormData() form: IFormData): Promise<string> {
     return this.fileUploadService.uploadFile(form);
   }

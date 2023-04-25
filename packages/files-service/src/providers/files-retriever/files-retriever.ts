@@ -1,4 +1,4 @@
-import { fileUuid } from './../../../../common/src/providers/uuid/file-uuid';
+import { fileUuid } from '@services/common';
 import { ConfigService } from '@nestjs/config';
 import { IFilesRetriever } from './files-retriever.interface';
 import { Inject, Injectable } from '@nestjs/common';

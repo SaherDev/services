@@ -42,10 +42,6 @@ async function bootstrap() {
     })
   );
 
-  console.log(
-    configService.get<number>('environment.storage.file.uploadFileLimit')
-  );
-
   await app.register(multiPart, {
     limits: {
       fileSize: configService.get<number>(

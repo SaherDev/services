@@ -7,18 +7,16 @@
         {
           "name": "@services/files-service",
           "commands": [
+            "source ~/.bash_profile",
             "cd packages/files-service",
-            "export COMMON_CONFIG_FILE_PATH=/Users/saherheib/dev/repos/config-services/common/common.config.yaml",
-            "export FILES_SERVICE_CONFIG_FILE_PATH=/Users/saherheib/dev/repos/config-services/files-service/files-service.config.yaml",
             "yarn start:dev"
           ]
         },
         {
           "name": "@services/auth-service",
           "commands": [
+            "source ~/.bash_profile",
             "cd packages/auth-service",
-            "export COMMON_CONFIG_FILE_PATH=/Users/saherheib/dev/repos/config-services/common/common.config.yaml",
-            "export AUTH_SERVICE_CONFIG_FILE_PATH=/Users/saherheib/dev/repos/config-services/auth-service/auth-service.config.yaml",
             "yarn start:dev"
           ]
         }

@@ -4,7 +4,7 @@ import { IRole } from './role.interface';
 
 @Schema({
   collection: 'role',
-  autoCreate: true,
+  autoCreate: false,
   autoIndex: false,
   timestamps: { createdAt: 'createdAt', updatedAt: 'lastUpdateAt' },
 })

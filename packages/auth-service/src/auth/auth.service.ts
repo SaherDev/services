@@ -271,7 +271,7 @@ export class AuthService {
         id: refreshToken.object.id,
       });
     } catch (error) {
-      findUserError;
+      findUserError = error;
     }
 
     if (findUserError || !user) {

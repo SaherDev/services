@@ -6,6 +6,8 @@ import {
   ReceiveMessageCommand,
   ReceiveMessageCommandOutput,
   SQSClient,
+  SendMessageCommand,
+  SendMessageCommandOutput,
 } from '@aws-sdk/client-sqs';
 
 import { IQueue } from '@/models';
@@ -52,6 +54,40 @@ export class Sqs implements IQueue {
     return this.client as T;
   }
 
+  async putObject<T>(
+    queueUrl: Readonly<string>,
+    delaySeconds: Readonly<number>,
+    body: Readonly<string>
+  ): Promise<T> {
+    if (!this.ready) throw new Error('not ready');
+    if (!body || !queueUrl || typeof delaySeconds !== 'number')
+      throw new Error(
+        `fields are missing >>  body = ${body} , queueUrl = ${queueUrl} delaySeconds = ${delaySeconds}`
+      );
+
+    let responseObject: SendMessageCommandOutput = null;
+    let error: any = null;
+    try {
+      responseObject = await this.client.send(
+        new SendMessageCommand({
+          MessageBody: body,
+          QueueUrl: queueUrl,
+          DelaySeconds: delaySeconds,
+        })
+      );
+    } catch (err: any) {
+      error = err;
+    }
+
+    if (!responseObject || error)
+      throw new Error(
+        `failed to putObject Objects to queue >>  error = ${JSON.stringify(
+          error
+        )}`
+      );
+
+    return responseObject.MessageId as T;
+  }
   async getObjects<T>(
     attributeNames: string[],
     maxNumberOfMessages: Readonly<number>,

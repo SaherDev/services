@@ -5,6 +5,12 @@ export interface IQueue {
     credentialsPath: Readonly<string>
   ): T;
 
+  putObject<T>(
+    queueUrl: Readonly<string>,
+    delaySeconds: Readonly<number>,
+    body: Readonly<string>
+  ): Promise<T>;
+
   getObjects<T>(
     attributeNames: string[],
     maxNumberOfMessages: Readonly<number>,

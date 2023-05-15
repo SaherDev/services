@@ -13,6 +13,15 @@ export class MessagesRetriever implements IMessagesRetriever {
   ) {
     this.initializeQueue();
   }
+
+  async put(message: Readonly<string>): Promise<any> {
+    return await this.queueUtil.putObject(
+      this.configServe.get<string>(`environment.queue.sqs.queueUrl`),
+      this.configServe.get<number>(`environment.queue.sqs.putWaitTimeSecond`),
+      message
+    );
+  }
+
   async get(): Promise<any> {
     return await this.queueUtil.getObjects(
       this.configServe.get<string[]>(`environment.queue.sqs.attributeNames`),
@@ -21,7 +30,7 @@ export class MessagesRetriever implements IMessagesRetriever {
         `environment.queue.sqs.messageAttributeNames`
       ),
       this.configServe.get<string>(`environment.queue.sqs.queueUrl`),
-      this.configServe.get<number>(`environment.queue.sqs.waitTimeSeconds`),
+      this.configServe.get<number>(`environment.queue.sqs.pullWaitTimeSeconds`),
       this.configServe.get<boolean>(
         `environment.queue.sqs.deleteFromQueueWhilePulling`
       )

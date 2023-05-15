@@ -2,13 +2,16 @@ import {
   FILES_RETRIEVER,
   FilesRetriever,
   MESSAGES_RETRIEVER,
+  MessagesRetriever,
+  THUMBNAILS_GENERATOR,
+  ThumbnailsGenerator,
 } from '@/providers';
+import { FUNCTION, Lambda } from '@services/utilities-functions';
 import { QUEUE, Sqs } from '@services/utilities-queue';
 import { S3, STORAGE } from '@services/utilities-storage';
 
 import { FileUploadController } from './file-upload.controller';
 import { FileUploadService } from './file-upload.service';
-import { MessagesRetriever } from './../providers/messages-retriever/message-retriever';
 import { Module } from '@nestjs/common';
 
 @Module({
@@ -31,7 +34,11 @@ import { Module } from '@nestjs/common';
       provide: QUEUE,
       useClass: Sqs,
     },
-
+    { provide: FUNCTION, useClass: Lambda },
+    {
+      provide: THUMBNAILS_GENERATOR,
+      useClass: ThumbnailsGenerator,
+    },
     {
       provide: MESSAGES_RETRIEVER,
       useClass: MessagesRetriever,

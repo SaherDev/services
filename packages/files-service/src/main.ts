@@ -29,16 +29,16 @@ async function bootstrap() {
   const configService: ConfigService = app.get(ConfigService);
 
   app.useLogger(
-    getLogLevels(configService.get<string>('environment.type') === 'production')
+    getLogLevels(configService.get<string>('environment.type') === 'prod')
   );
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       disableErrorMessages:
-        configService.get<string>('environment.type') === 'production',
+        configService.get<string>('environment.type') === 'prod',
       enableDebugMessages:
-        configService.get<string>('environment.type') !== 'production',
+        configService.get<string>('environment.type') !== 'prod',
     })
   );
 

@@ -29,7 +29,7 @@ async function bootstrap() {
   const configService: ConfigService = app.get(ConfigService);
 
   app.useLogger(
-    getLogLevels(configService.get<string>('environment.type') === 'production')
+    getLogLevels(configService.get<string>('environment.type') === 'prod')
   );
 
   await app.register(secureSession, {
@@ -39,7 +39,7 @@ async function bootstrap() {
       maxAge: configService.get<string>('common.auth.sessionMaxAge'),
       path: '/',
       httpOnly: true,
-      secure: configService.get<string>('environment.type') === 'production',
+      secure: configService.get<string>('environment.type') === 'prod',
       sameSite: 'lax',
     },
   });
@@ -48,9 +48,9 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       disableErrorMessages:
-        configService.get<string>('environment.type') === 'production',
+        configService.get<string>('environment.type') === 'prod',
       enableDebugMessages:
-        configService.get<string>('environment.type') !== 'production',
+        configService.get<string>('environment.type') !== 'prod',
     })
   );
 

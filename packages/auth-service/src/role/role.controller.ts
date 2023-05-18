@@ -1,11 +1,12 @@
 import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Serialize } from '@services/common';
+import { AuthenticationRequired, Serialize } from '@services/common';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './dto';
 import { RoleService } from './role.service';
 
 @Controller('role')
 @ApiTags('role')
+@AuthenticationRequired()
 export class RoleController {
   constructor(private readonly rolesService: RoleService) {}
 

@@ -182,7 +182,7 @@ export class AuthService {
     }
 
     if (!existingUserResponse) {
-      throw new NotFoundException('user not found');
+      throw new UnauthorizedException('user not found');
     }
 
     const verifyPassword: boolean = await this.passwordHasher.verifyPassword(

@@ -1,14 +1,19 @@
 import { UserPermission } from '@/models';
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticationRequired,
   AuthorizationRequired,
   Serialize,
-  UserSession,
 } from '@services/common';
-import { IUserSession } from '@services/models';
 import { AuthService } from './auth.service';
 import {
   associateRoleWithUserDto,
@@ -49,6 +54,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   refreshToken(): Promise<UserDto> {
     return this.authService.refreshToken();
   }

@@ -38,7 +38,7 @@ export async function createInstance() {
     secret: configService.get<string>('common.auth.sessionWrapperSecret'),
     salt: configService.get<string>('common.auth.sessionWrapperSalt'),
     cookie: {
-      maxAge: configService.get<string>('common.auth.sessionMaxAge'),
+      maxAge: configService.get<number>('common.auth.sessionMaxAge'),
       path: '/',
       httpOnly: true,
       secure: configService.get<string>('environment.type') === 'prod',

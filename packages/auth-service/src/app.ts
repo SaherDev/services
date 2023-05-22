@@ -1,4 +1,4 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -19,14 +19,14 @@ export async function createInstance() {
     new FastifyAdapter(instance)
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('auth-service')
-    .setDescription('auth service for user authentication')
-    .setVersion('1.0')
-    .build();
+  // const config = new DocumentBuilder()
+  //   .setTitle('auth-service')
+  //   .setDescription('auth service for user authentication')
+  //   .setVersion('1.0')
+  //   .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api', app, document);
 
   const configService: ConfigService = app.get(ConfigService);
 
@@ -55,6 +55,5 @@ export async function createInstance() {
         configService.get<string>('environment.type') !== 'prod',
     })
   );
-
   return { instance, app, configService };
 }

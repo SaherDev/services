@@ -15,7 +15,9 @@ export const handler = async (
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   if (!appInstance) {
-    appInstance = (await createInstance()).instance;
+    const { instance, app } = await createInstance();
+    app.init();
+    appInstance = instance;
   }
   return await proxy(appInstance, event, context);
 };

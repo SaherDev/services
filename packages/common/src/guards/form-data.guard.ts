@@ -11,7 +11,7 @@ import { FastifyRequest } from 'fastify';
 
 declare module 'fastify' {
   interface FastifyRequest {
-    file: () => MultipartFile;
+    // file: () => MultipartFile;
     isMultipart: () => boolean;
   }
 }
@@ -20,9 +20,11 @@ declare module 'fastify' {
 export class FormDataGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<FastifyRequest>();
+
     const isMultipart = req.isMultipart();
     if (!isMultipart)
       throw new BadRequestException('multipart/form-data expected.');
+    //@ts-ignore
     const multiPart = await req.file();
 
     if (!multiPart) throw new BadRequestException('file expected');

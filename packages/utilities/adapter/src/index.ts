@@ -1,1 +1,1 @@
-export const djhfjhjf = '';
+export * from './adapter';

@@ -11,17 +11,16 @@ export class DataProcessorFactory {
   }
 
   private static init(): void {
-    DataProcessorFactory._dataProcessors[DataSourceType.json] =
-      new JsonProcessor();
+    this._dataProcessors[DataSourceType.json] = new JsonProcessor();
   }
 
   static getProcessor(type: DataSourceType): IBufferProcessor {
-    if (!DataProcessorFactory._dataProcessors[type]) {
+    if (!this._dataProcessors[type]) {
       throw new Error(
         `getProcessor >> Data processor for ${type} is not defined`
       );
     }
 
-    return DataProcessorFactory._dataProcessors[type];
+    return this._dataProcessors[type];
   }
 }

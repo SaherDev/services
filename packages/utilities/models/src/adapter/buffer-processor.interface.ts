@@ -1,5 +1,5 @@
 export interface IBufferProcessor {
-  toRows(
+  toRowsAsync(
     buffer: any,
     options: Record<string, any>
   ): AsyncGenerator<any, void, void>;

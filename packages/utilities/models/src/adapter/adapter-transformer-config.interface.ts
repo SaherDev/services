@@ -1,5 +1,5 @@
 export interface IAdapterTransformerConfig {
-  accessKeys: string[] | string;
+  accessKeys: string[];
   target: string;
   defaultValue?: any;
   lookupName?: string;
@@ -7,5 +7,6 @@ export interface IAdapterTransformerConfig {
   validate?: {
     condition: string;
     severity: string;
+    message: string;
   };
 }

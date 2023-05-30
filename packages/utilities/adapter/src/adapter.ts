@@ -30,17 +30,10 @@ export class Adapter {
     transformers: IAdapterTransformerConfig[],
     lookups: IAdapterDictionaryConfig
   ): Promise<ITransformResult<T>> {
-    const data: T[] = [];
-    const errors: ITransformError[] = [];
-    for await (const value of rowsDataAsync) {
-      const transformRowResult: ITransformResult<T> =
-        DataTransformer.transformRow<T>(value, transformers, lookups);
-      data.push(transformRowResult.data as T);
-      errors.push(...transformRowResult.errors);
-    }
-    return {
-      data,
-      errors,
-    };
+    return await DataTransformer.transform<T>(
+      rowsDataAsync,
+      transformers,
+      lookups
+    );
   }
 }

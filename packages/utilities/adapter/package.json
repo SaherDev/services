@@ -13,6 +13,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@services/models": "workspace:^"
+    "@services/models": "workspace:^",
+    "vm2": "^3.9.19"
   }
 }

@@ -8,7 +8,7 @@ import {
 } from '@services/models';
 
 import { DataProcessorFactory } from './data-processor';
-import { DataRetriever } from './data-retriver';
+import { DataRetriever } from './data-retriever';
 import { DataTransformer } from './data-transformer';
 
 export class Adapter {

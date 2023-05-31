@@ -1,17 +1,19 @@
 import {
   DataSourceType,
   IAdapterLookupConfig,
+  IAdapterRequestConfig,
   IAdapterTransformerConfig,
   IBufferProcessor,
   ITransformResult,
 } from '@services/models';
 
 import { DataProcessorFactory } from './data-processor';
+import { DataRetriever } from './data-retriver';
 import { DataTransformer } from './data-transformer';
 
 export class Adapter {
-  static async pullData(): Promise<any> {
-    return null;
+  static async pullData(config: IAdapterRequestConfig): Promise<any> {
+    return await DataRetriever.pullData(config);
   }
 
   static parseData(

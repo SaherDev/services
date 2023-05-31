@@ -6,6 +6,10 @@ import {
   TransformError,
   TransformResult,
 } from '@services/models';
+import {
+  ObjectFieldsAccessor,
+  UntrustedCodeProcessor,
+} from '@services/common-helpers';
 
 export class DataTransformer {
   static async transform<T>(
@@ -31,7 +35,7 @@ export class DataTransformer {
 
     transformers.forEach((transformer) => {
       try {
-        this.transformColumn<T>(row, newRowObject, transformer, lookups);
+        this.transformColumn(row, newRowObject, transformer, lookups);
       } catch (error) {
         if (error instanceof TransformError) {
           result.pushError(error as ITransformError);
@@ -43,7 +47,7 @@ export class DataTransformer {
       result.pushData(newRowObject as T);
   }
 
-  private static transformColumn<T>(
+  private static transformColumn(
     originalData: any,
     targetObject: any,
     transformer: IAdapterTransformerConfig,
@@ -75,8 +79,9 @@ export class DataTransformer {
     );
 
     return (
-      processorFunc(...this.getValuesFromData(originalData, accessKey)) ??
-      defaultValue
+      processorFunc(
+        ...ObjectFieldsAccessor.getValues(originalData, accessKey)
+      ) ?? defaultValue
     );
   }
 
@@ -87,15 +92,15 @@ export class DataTransformer {
   ): void {
     const validateResult: boolean = this.validateValue(value, transformer);
     if (!validateResult) {
-      ///empty value
+      ObjectFieldsAccessor.setValue(transformer.target, targetObject, '');
       throw new TransformError(
         transformer.target,
         transformer.validate?.condition ?? '',
         transformer.validate?.severity ?? '',
-        transformer.validate?.message ?? ''
+        transformer.validate?.message ?? 'unknown error'
       );
     } else {
-      ///real value
+      ObjectFieldsAccessor.setValue(transformer.target, targetObject, value);
     }
   }
 
@@ -104,29 +109,25 @@ export class DataTransformer {
     transformer: IAdapterTransformerConfig
   ): boolean {
     if (transformer.validate) {
-      const evalFunc = eval(transformer.validate.condition);
-      if (evalFunc) return evalFunc;
+      try {
+        const unstructuredFunc: Function | null =
+          this.generateFunctionFromUnstructuredCode(
+            transformer.validate.condition
+          );
+        if (unstructuredFunc) return unstructuredFunc(value);
+      } catch (error) {}
     }
-    return value;
+    return false;
   }
 
-  private static getValuesFromData(
-    data: any,
-    accessKey: Readonly<string[]>
-  ): any[] {
-    return accessKey.map((key) => {
-      return key.split('.').reduce((currentValue, keyPart) => {
-        if (
-          currentValue &&
-          typeof currentValue === 'object' &&
-          keyPart in currentValue
-        ) {
-          return currentValue[keyPart];
-        } else {
-          return undefined;
-        }
-      }, data);
-    });
+  private static generateFunctionFromUnstructuredCode(
+    functionCode: Readonly<string>
+  ): Function | null {
+    try {
+      return UntrustedCodeProcessor.process(functionCode);
+    } catch (error) {}
+
+    return null;
   }
 
   private static generateFinalFromFunction(
@@ -134,8 +135,9 @@ export class DataTransformer {
     lookups: IAdapterLookupConfig[],
     accessFnc: string = ''
   ): Function {
-    const evalFunc = eval(accessFnc);
-    if (evalFunc) return evalFunc;
+    const unstructuredFunc: Function | null =
+      this.generateFunctionFromUnstructuredCode(accessFnc);
+    if (unstructuredFunc) return unstructuredFunc;
 
     if (lookupName) {
       const lookup = lookups.find((l) => l.name === lookupName);

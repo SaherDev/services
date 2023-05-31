@@ -1,5 +1,5 @@
 export interface IAdapterTransformerConfig {
-  accessKeys: string[];
+  accessKeys?: string[];
   target: string;
   defaultValue?: any;
   lookupName?: string;

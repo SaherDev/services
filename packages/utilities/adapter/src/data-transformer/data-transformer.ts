@@ -1,7 +1,6 @@
 import {
   IAdapterLookupConfig,
   IAdapterTransformerConfig,
-  ITransformError,
   ITransformResult,
   TransformError,
   TransformResult,
@@ -38,7 +37,7 @@ export class DataTransformer {
         this.transformColumn(row, newRowObject, transformer, lookups);
       } catch (error) {
         if (error instanceof TransformError) {
-          result.pushError(error as ITransformError);
+          result.pushError(error.toJson());
         }
       }
     });
@@ -66,7 +65,7 @@ export class DataTransformer {
   }
   private static fromValue(
     originalData: any,
-    accessKey: Readonly<string[]>,
+    accessKey: Readonly<string[]> = [],
     defaultValue: Readonly<string> = '',
     lookupName: Readonly<string>,
     lookups: IAdapterLookupConfig[] = [],
@@ -108,16 +107,18 @@ export class DataTransformer {
     value: any,
     transformer: IAdapterTransformerConfig
   ): boolean {
-    if (transformer.validate) {
+    if (transformer?.validate) {
       try {
         const unstructuredFunc: Function | null =
           this.generateFunctionFromUnstructuredCode(
             transformer.validate.condition
           );
         if (unstructuredFunc) return unstructuredFunc(value);
-      } catch (error) {}
+      } catch (error) {
+        return false;
+      }
     }
-    return false;
+    return true;
   }
 
   private static generateFunctionFromUnstructuredCode(

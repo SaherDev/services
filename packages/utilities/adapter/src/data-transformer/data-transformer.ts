@@ -3,6 +3,7 @@ import {
   IAdapterTransformerConfig,
   ITransformError,
   ITransformResult,
+  TransformError,
   TransformResult,
 } from '@services/models';
 
@@ -26,13 +27,25 @@ export class DataTransformer {
     lookups: IAdapterDictionaryConfig,
     result: ITransformResult<T>
   ): void {
+    const newRowObject = {};
+
     transformers.forEach((transformer) => {
-      this.transformColumn<T>(row, transformer, lookups);
+      try {
+        this.transformColumn<T>(row, newRowObject, transformer, lookups);
+      } catch (error) {
+        if (error instanceof TransformError) {
+          result.pushError(error as ITransformError);
+        }
+      }
     });
+
+    if (Object.keys(newRowObject).length > 0)
+      result.pushData(newRowObject as T);
   }
 
   private static transformColumn<T>(
     originalData: any,
+    targetData: any,
     transformers: IAdapterTransformerConfig,
     lookups: IAdapterDictionaryConfig
   ): void {
@@ -47,7 +60,7 @@ export class DataTransformer {
   ): any {}
   private static toTarget(target: Readonly<string>) {}
   private static validateResult(): boolean {
-    return false;
+    throw new TransformError('dl', 'l;d', '', '');
   }
 
   private static generateFromFunction(

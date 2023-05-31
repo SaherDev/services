@@ -1,9 +1,8 @@
 import {
   DataSourceType,
-  IAdapterDictionaryConfig,
+  IAdapterLookupConfig,
   IAdapterTransformerConfig,
   IBufferProcessor,
-  ITransformError,
   ITransformResult,
 } from '@services/models';
 
@@ -28,7 +27,7 @@ export class Adapter {
   static async transformData<T>(
     rowsDataAsync: AsyncGenerator<any, void, void>,
     transformers: IAdapterTransformerConfig[],
-    lookups: IAdapterDictionaryConfig
+    lookups: IAdapterLookupConfig[]
   ): Promise<ITransformResult<T>> {
     return await DataTransformer.transform<T>(
       rowsDataAsync,

@@ -1,5 +1,5 @@
 import {
-  IAdapterDictionaryConfig,
+  IAdapterLookupConfig,
   IAdapterTransformerConfig,
   ITransformError,
   ITransformResult,
@@ -11,7 +11,7 @@ export class DataTransformer {
   static async transform<T>(
     rowsDataAsync: AsyncGenerator<any, void, void>,
     transformers: IAdapterTransformerConfig[],
-    lookups: IAdapterDictionaryConfig
+    lookups: IAdapterLookupConfig[]
   ): Promise<ITransformResult<T>> {
     const result = new TransformResult<T>([], []);
 
@@ -24,7 +24,7 @@ export class DataTransformer {
   private static transformRowAndSetResult<T>(
     row: Readonly<any>,
     transformers: IAdapterTransformerConfig[],
-    lookups: IAdapterDictionaryConfig,
+    lookups: IAdapterLookupConfig[],
     result: ITransformResult<T>
   ): void {
     const newRowObject = {};
@@ -45,30 +45,104 @@ export class DataTransformer {
 
   private static transformColumn<T>(
     originalData: any,
-    targetData: any,
-    transformers: IAdapterTransformerConfig,
-    lookups: IAdapterDictionaryConfig
+    targetObject: any,
+    transformer: IAdapterTransformerConfig,
+    lookups: IAdapterLookupConfig[]
   ): void {
-    return null;
+    const fromValue: any = this.fromValue(
+      originalData,
+      transformer.accessKeys,
+      transformer.defaultValue,
+      transformer.lookupName,
+      lookups,
+      transformer.accessFnc
+    );
+
+    this.toTarget(targetObject, fromValue, transformer);
   }
-  private static fromValues(
+  private static fromValue(
     originalData: any,
-    accessKeys: Readonly<string[]>,
-    defaultValue: Readonly<string>,
-    lookups: IAdapterDictionaryConfig,
-    accessFnc?: string
-  ): any {}
-  private static toTarget(target: Readonly<string>) {}
-  private static validateResult(): boolean {
-    throw new TransformError('dl', 'l;d', '', '');
+    accessKey: Readonly<string[]>,
+    defaultValue: Readonly<string> = '',
+    lookupName: Readonly<string>,
+    lookups: IAdapterLookupConfig[] = [],
+    accessFnc: string = ''
+  ): any {
+    const processorFunc: Function = this.generateFinalFromFunction(
+      lookupName,
+      lookups,
+      accessFnc
+    );
+
+    return (
+      processorFunc(...this.getValuesFromData(originalData, accessKey)) ??
+      defaultValue
+    );
   }
 
-  private static generateFromFunction(
-    accessKeys: Readonly<string[]>,
-    defaultValue: Readonly<string>,
-    lookups: IAdapterDictionaryConfig,
-    accessFnc?: string
+  private static toTarget(
+    targetObject: any,
+    value: any,
+    transformer: IAdapterTransformerConfig
+  ): void {
+    const validateResult: boolean = this.validateValue(value, transformer);
+    if (!validateResult) {
+      ///empty value
+      throw new TransformError(
+        transformer.target,
+        transformer.validate?.condition ?? '',
+        transformer.validate?.severity ?? '',
+        transformer.validate?.message ?? ''
+      );
+    } else {
+      ///real value
+    }
+  }
+
+  private static validateValue(
+    value: any,
+    transformer: IAdapterTransformerConfig
+  ): boolean {
+    if (transformer.validate) {
+      const evalFunc = eval(transformer.validate.condition);
+      if (evalFunc) return evalFunc;
+    }
+    return value;
+  }
+
+  private static getValuesFromData(
+    data: any,
+    accessKey: Readonly<string[]>
+  ): any[] {
+    return accessKey.map((key) => {
+      return key.split('.').reduce((currentValue, keyPart) => {
+        if (
+          currentValue &&
+          typeof currentValue === 'object' &&
+          keyPart in currentValue
+        ) {
+          return currentValue[keyPart];
+        } else {
+          return undefined;
+        }
+      }, data);
+    });
+  }
+
+  private static generateFinalFromFunction(
+    lookupName: Readonly<string>,
+    lookups: IAdapterLookupConfig[],
+    accessFnc: string = ''
   ): Function {
-    return null;
+    const evalFunc = eval(accessFnc);
+    if (evalFunc) return evalFunc;
+
+    if (lookupName) {
+      const lookup = lookups.find((l) => l.name === lookupName);
+      if (lookup) {
+        return (value: any) => lookup.options[value] ?? lookup.defaultValue;
+      }
+    }
+    return (value: any) => value;
   }
 }

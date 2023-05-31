@@ -1,13 +1,9 @@
-import axios, { AxiosInstance, AxiosRequestConfig, Method } from 'axios';
+import axios, { AxiosInstance, Method } from 'axios';
 
 import { IHTTPFetchConfig } from '@/models';
 
 export class HTTPService {
-  private static httpClient: AxiosInstance;
-
-  constructor() {
-    HTTPService.httpClient = axios.create();
-  }
+  private static readonly httpClient: AxiosInstance = axios.create();
 
   static async fetch<T>(
     url: string,

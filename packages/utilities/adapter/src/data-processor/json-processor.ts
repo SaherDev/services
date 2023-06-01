@@ -5,7 +5,7 @@ export class JsonProcessor implements IBufferProcessor {
     buffer: any,
     options: Record<string, any> = {}
   ): AsyncGenerator<any, void, void> {
-    for await (const x of buffer) {
+    for (const x of buffer) {
       yield x;
     }
   }

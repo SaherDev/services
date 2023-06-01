@@ -8,3 +8,4 @@ export * from './transform-error.interface';
 export * from './transform-result.interface';
 export * from './transform-error';
 export * from './transform-result';
+export * from './transformer.interface';

@@ -2,6 +2,7 @@ import {
   IAdapterLookupConfig,
   IAdapterTransformerConfig,
   ITransformResult,
+  ITransformer,
   TransformError,
   TransformResult,
 } from '@services/models';
@@ -10,31 +11,35 @@ import {
   UntrustedCodeProcessor,
 } from '@services/common-helpers';
 
+import { Transformer } from './transformer';
+
 export class DataTransformer {
   static async transform<T>(
     rowsDataAsync: AsyncGenerator<any, void, void>,
-    transformers: IAdapterTransformerConfig[],
+    config: IAdapterTransformerConfig[],
     lookups: IAdapterLookupConfig[]
   ): Promise<ITransformResult<T>> {
     const result = new TransformResult<T>([], []);
-
+    const transformers: ITransformer[] = this.prepareTransformers(
+      config,
+      lookups
+    );
     for await (const value of rowsDataAsync) {
-      this.transformRowAndSetResult<T>(value, transformers, lookups, result);
+      this.transformRowAndSetResult<T>(value, transformers, result);
     }
     return result;
   }
 
   private static transformRowAndSetResult<T>(
     row: Readonly<any>,
-    transformers: IAdapterTransformerConfig[],
-    lookups: IAdapterLookupConfig[],
+    transformers: ITransformer[],
     result: ITransformResult<T>
   ): void {
     const newRowObject = {};
 
     transformers.forEach((transformer) => {
       try {
-        this.transformColumn(row, newRowObject, transformer, lookups);
+        this.transformColumn(row, newRowObject, transformer);
       } catch (error) {
         if (error instanceof TransformError) {
           result.pushError(error.toJson());
@@ -49,76 +54,27 @@ export class DataTransformer {
   private static transformColumn(
     originalData: any,
     targetObject: any,
-    transformer: IAdapterTransformerConfig,
-    lookups: IAdapterLookupConfig[]
+    transformer: ITransformer
   ): void {
-    const fromValue: any = this.fromValue(
-      originalData,
-      transformer.accessKeys,
-      transformer.defaultValue,
-      transformer.lookupName,
-      lookups,
-      transformer.accessFnc
+    const fromValue: any = transformer.applyAccessValuesFunction(
+      ObjectFieldsAccessor.getValues(originalData, transformer.accusesKeys)
     );
 
     this.toTarget(targetObject, fromValue, transformer);
-  }
-  private static fromValue(
-    originalData: any,
-    accessKey: Readonly<string[]> = [],
-    defaultValue: Readonly<string> = '',
-    lookupName: Readonly<string>,
-    lookups: IAdapterLookupConfig[] = [],
-    accessFnc: string = ''
-  ): any {
-    const processorFunc: Function = this.generateFinalFromFunction(
-      lookupName,
-      lookups,
-      accessFnc
-    );
-
-    return (
-      processorFunc(
-        ...ObjectFieldsAccessor.getValues(originalData, accessKey)
-      ) ?? defaultValue
-    );
   }
 
   private static toTarget(
     targetObject: any,
     value: any,
-    transformer: IAdapterTransformerConfig
+    transformer: ITransformer
   ): void {
-    const validateResult: boolean = this.validateValue(value, transformer);
+    const validateResult: boolean = transformer.validateValue(value);
     if (!validateResult) {
       ObjectFieldsAccessor.setValue(transformer.target, targetObject, '');
-      throw new TransformError(
-        transformer.target,
-        transformer.validate?.condition ?? '',
-        transformer.validate?.severity ?? '',
-        transformer.validate?.message ?? 'unknown error'
-      );
+      transformer.throwErrorForInvalidValue(value);
     } else {
       ObjectFieldsAccessor.setValue(transformer.target, targetObject, value);
     }
-  }
-
-  private static validateValue(
-    value: any,
-    transformer: IAdapterTransformerConfig
-  ): boolean {
-    if (transformer?.validate) {
-      try {
-        const unstructuredFunc: Function | null =
-          this.generateFunctionFromUnstructuredCode(
-            transformer.validate.condition
-          );
-        if (unstructuredFunc) return unstructuredFunc(value);
-      } catch (error) {
-        return false;
-      }
-    }
-    return true;
   }
 
   private static generateFunctionFromUnstructuredCode(
@@ -131,20 +87,36 @@ export class DataTransformer {
     return null;
   }
 
-  private static generateFinalFromFunction(
-    lookupName: Readonly<string>,
-    lookups: IAdapterLookupConfig[],
-    accessFnc: string = ''
+  private static prepareTransformers(
+    transformers: IAdapterTransformerConfig[],
+    lookups: IAdapterLookupConfig[]
+  ): ITransformer[] {
+    const lookupsMap: Map<string, IAdapterLookupConfig> = new Map(
+      lookups.map((l) => [l.name, l])
+    );
+
+    return transformers.map((config) => {
+      return new Transformer(
+        config,
+        this.generateFromFunction(
+          config?.accessFnc,
+          lookupsMap.get(config.lookupName)
+        ),
+        this.generateFunctionFromUnstructuredCode(config?.validate?.condition)
+      );
+    });
+  }
+
+  private static generateFromFunction(
+    accessFnc: string = '',
+    lookup: IAdapterLookupConfig
   ): Function {
     const unstructuredFunc: Function | null =
       this.generateFunctionFromUnstructuredCode(accessFnc);
     if (unstructuredFunc) return unstructuredFunc;
 
-    if (lookupName) {
-      const lookup = lookups.find((l) => l.name === lookupName);
-      if (lookup) {
-        return (value: any) => lookup.options[value] ?? lookup.defaultValue;
-      }
+    if (lookup) {
+      return (value: any) => lookup.options[value] ?? lookup.defaultValue;
     }
     return (value: any) => value;
   }

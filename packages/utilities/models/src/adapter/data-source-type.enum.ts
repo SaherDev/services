@@ -1,4 +1,4 @@
 export enum DataSourceType {
-  Excel = 'excel',
+  Excel = 'xlsx',
   json = 'json',
 }

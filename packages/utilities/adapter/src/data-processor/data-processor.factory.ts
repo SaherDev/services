@@ -1,5 +1,6 @@
 import { DataSourceType, IBufferProcessor } from '@services/models';
 
+import { ExcelProcessor } from './excel-processor';
 import { JsonProcessor } from './json-processor';
 
 export class DataProcessorFactory {
@@ -8,6 +9,7 @@ export class DataProcessorFactory {
 
   private static init(): void {
     this._dataProcessors[DataSourceType.json] = new JsonProcessor();
+    this._dataProcessors[DataSourceType.Excel] = new ExcelProcessor();
   }
 
   static getProcessor(type: DataSourceType): IBufferProcessor {

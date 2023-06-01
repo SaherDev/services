@@ -1,3 +1,3 @@
 export interface IAdapterParserConfig {
-  options: Record<string, any>;
+  options?: Record<string, any>;
 }

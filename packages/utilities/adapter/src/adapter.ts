@@ -1,6 +1,7 @@
 import {
   DataSourceType,
   IAdapterLookupConfig,
+  IAdapterParserConfig,
   IAdapterRequestConfig,
   IAdapterTransformerConfig,
   IBufferProcessor,
@@ -19,11 +20,14 @@ export class Adapter {
   static parseData(
     schemaDataType: DataSourceType,
     data: any,
-    options: Record<string, any> = {}
+    config: IAdapterParserConfig
   ): AsyncGenerator<any, void, void> {
     const processor: IBufferProcessor =
       DataProcessorFactory.getProcessor(schemaDataType);
-    return processor.toRowsAsync(Array.isArray(data) ? data : [data], options);
+    return processor.toRowsAsync(
+      Array.isArray(data) ? data : [data],
+      config.options
+    );
   }
 
   static async transformData<T>(

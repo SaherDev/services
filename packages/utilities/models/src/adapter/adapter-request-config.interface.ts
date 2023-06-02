@@ -4,5 +4,4 @@ export interface IAdapterRequestConfig {
   headers?: Record<string, string>;
   params?: Record<string, string>;
   body?: Record<string, unknown>;
-  dataPath?: string;
 }

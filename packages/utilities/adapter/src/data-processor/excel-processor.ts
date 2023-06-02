@@ -1,30 +1,23 @@
-import { IBufferProcessor } from '@services/models';
+import { IAdapterParserConfig, IBufferProcessor } from '@services/models';
+
 import { ObjectFieldsAccessor } from '@services/common-helpers';
+import readXlsxFile from 'read-excel-file/node';
 export class ExcelProcessor implements IBufferProcessor {
   async *toRowsAsync(
     buffer: any,
-    options: Record<string, any> = {}
+    config: IAdapterParserConfig
   ): AsyncGenerator<any, void, void> {
-    const sheetName = options?.sheetName;
+    const sheetName = config.dataPath;
+    const rows = await readXlsxFile(buffer, { sheet: sheetName });
 
-    const workbook = await buffer.xlsx.readFile(buffer.path);
-    const sheet = workbook?.sheets?.[sheetName];
+    const [headers, ...data] = rows;
 
-    if (!sheet) {
-      throw new Error(`Sheet ${sheetName} not found`);
-    }
-
-    const rows = sheet.getRows();
-    const header = rows[0];
-
-    const data = rows.slice(1);
-
-    for await (const row of data) {
+    for (const row of data) {
       const obj = {};
 
-      for (const [index, value] of row.entries()) {
-        ObjectFieldsAccessor.setValue(header[index], obj, value);
-      }
+      headers.forEach((header, i) => {
+        ObjectFieldsAccessor.setValue(header.toString(), obj, row[i]);
+      });
 
       yield obj;
     }

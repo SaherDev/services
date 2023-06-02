@@ -1,6 +1,8 @@
+import { IAdapterParserConfig } from './adapter.parser.config.interface';
+
 export interface IBufferProcessor {
   toRowsAsync(
     buffer: any,
-    options: Record<string, any>
+    config: IAdapterParserConfig
   ): AsyncGenerator<any, void, void>;
 }

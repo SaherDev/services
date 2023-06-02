@@ -24,7 +24,7 @@ export class Adapter {
   ): AsyncGenerator<any, void, void> {
     const processor: IBufferProcessor =
       DataProcessorFactory.getProcessor(schemaDataType);
-    return processor.toRowsAsync(Array.isArray(data) ? data : [data], config);
+    return processor.toRowsAsync(data, config);
   }
 
   static async transformData<T>(

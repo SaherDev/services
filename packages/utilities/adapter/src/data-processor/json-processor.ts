@@ -7,9 +7,10 @@ export class JsonProcessor implements IBufferProcessor {
     buffer: any,
     config: IAdapterParserConfig
   ): AsyncGenerator<any, void, void> {
-    const data = config?.dataPath
-      ? ObjectFieldsAccessor.getValues(buffer, [config?.dataPath])
-      : buffer;
+    let data =
+      ObjectFieldsAccessor.getValues(buffer, [config?.dataPath])[0] ?? buffer;
+
+    data = Array.isArray(data) ? data : [data];
 
     for (const x of data) {
       yield x;

@@ -6,7 +6,7 @@ import {
   IAdapterTransformerConfig,
   IBufferProcessor,
   ITransformResult,
-} from '@services/models';
+} from '@/models';
 
 import { DataProcessorFactory } from './data-processor';
 import { DataRetriever } from './data-retriever';

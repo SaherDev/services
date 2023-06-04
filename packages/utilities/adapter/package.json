@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@services/common-helpers": "workspace:^",
-    "@services/models": "workspace:^",
     "read-excel-file": "^5.6.1"
   }
 }

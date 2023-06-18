@@ -1,5 +1,5 @@
 import { HTTPService } from '@services/common-helpers';
-import { IAdapterRequestConfig } from '@/models';
+import { IAdapterRequestConfig } from '../models';
 
 export class DataRetriever {
   static async pullData(

@@ -2,7 +2,7 @@ import {
   IAdapterTransformerConfig,
   ITransformer,
   TransformError,
-} from '@/models';
+} from '../models';
 export class Transformer implements ITransformer {
   constructor(
     private config: IAdapterTransformerConfig,

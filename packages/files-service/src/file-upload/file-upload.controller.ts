@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { FileDto, MoveFileFileDto } from './dto';
+import { FileDto, MoveFileFileDto, pullDataDto } from './dto';
 import { FileUploadService } from './file-upload.service';
 import {
   FormData,
@@ -25,6 +34,15 @@ export class FileUploadController {
   //ONLY WITH @EXPOSE()
   async moveFile(@Body() moveFileDto: MoveFileFileDto): Promise<FileDto> {
     return { filePath: 'newPath', fileId: 'file-id' };
+  }
+
+  @Post('pull-data')
+  @HttpCode(HttpStatus.OK)
+  async pullData(@Body() pullDataDto: pullDataDto): Promise<FileDto> {
+    return this.fileUploadService.pullData(
+      pullDataDto.schemasLocationId,
+      pullDataDto.schemaName
+    );
   }
 
   @Post('file')

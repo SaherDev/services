@@ -1,4 +1,4 @@
-import { DataSourceType, IBufferProcessor } from '@/models';
+import { DataSourceType, IBufferProcessor } from '../models';
 
 import { ExcelProcessor } from './excel-processor';
 import { JsonProcessor } from './json-processor';

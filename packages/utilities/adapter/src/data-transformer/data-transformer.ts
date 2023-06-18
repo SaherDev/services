@@ -5,7 +5,7 @@ import {
   ITransformer,
   TransformError,
   TransformResult,
-} from '@/models';
+} from '../models';
 import {
   ObjectFieldsAccessor,
   UntrustedCodeProcessor,

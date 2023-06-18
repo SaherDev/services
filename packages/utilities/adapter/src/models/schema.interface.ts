@@ -6,9 +6,10 @@ import { IAdapterTransformerConfig } from './adapter-transformer-config.interfac
 
 export interface IAdapterSchema {
   meta: any;
+  name: string;
   dataType: DataSourceType;
   parser: IAdapterParserConfig;
-  transformer: IAdapterTransformerConfig[];
+  transformers: IAdapterTransformerConfig[];
   lookups: IAdapterLookupConfig[];
   request?: IAdapterRequestConfig;
 }

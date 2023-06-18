@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { IFilesRetriever, FILES_RETRIEVER } from '@/providers';
 import { IFormData } from '@services/common';
-
+import { IAdapterSchema, Adapter } from '@services/adapter';
+import { StreamProcessor } from '@services/common-helpers';
 @Injectable()
 export class FileUploadService {
   private logger = new Logger(FileUploadService.name);
@@ -65,5 +66,56 @@ export class FileUploadService {
     }
 
     return uploadFileResponse;
+  }
+
+  async pullData(
+    schemasLocationId: Readonly<string>,
+    schemaName: Readonly<string>
+  ) {
+    let schema: IAdapterSchema;
+    try {
+      let schemas = await this.getFile(schemasLocationId);
+
+      schemas = await StreamProcessor.readStreamAsJson(schemas);
+      schema = schemas?.find((sc) => sc.name === schemaName);
+      if (!schema) {
+        throw new Error();
+      }
+    } catch (error) {
+      this.logger.error(
+        `pullData >> schema not found aborting, schemasLocationId = ${schemasLocationId}, schemaName = ${schemaName}`
+      );
+
+      throw new BadRequestException('Schema Not found');
+    }
+
+    let parsedDataGenerator: AsyncGenerator<any, void, void> = null;
+    try {
+      let pulledDat = await Adapter.pullData(schema.request);
+      if (!pulledDat) {
+        throw new Error();
+      }
+
+      parsedDataGenerator = Adapter.parseData(
+        schema.dataType,
+        pulledDat,
+        schema.parser
+      );
+
+      if (!parsedDataGenerator) {
+        throw new Error();
+      }
+    } catch (error) {
+      this.logger.error(
+        `pullData >> empty data, aborting, error = ${JSON.stringify(error)}`
+      );
+      throw new InternalServerErrorException('Parsing Failed');
+    }
+
+    return await Adapter.transformData(
+      parsedDataGenerator,
+      schema.transformers,
+      schema.lookups
+    );
   }
 }

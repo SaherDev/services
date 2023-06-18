@@ -1,4 +1,4 @@
-import { IAdapterParserConfig, IBufferProcessor } from '@/models';
+import { IAdapterParserConfig, IBufferProcessor } from '../models';
 
 import { ObjectFieldsAccessor } from '@services/common-helpers';
 

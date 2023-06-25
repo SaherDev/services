@@ -3458,10 +3458,10 @@ __metadata:
     "@nestjs/schematics": ^9.0.0
     "@nestjs/swagger": ^6.3.0
     "@nestjs/testing": ^9.0.0
-    "@services/common": 1.0.0
+    "@services/common": ^1.0.1
     "@services/models": "workspace:^"
-    "@services/utilities-queue": 1.1.0
-    "@services/utilities-storage": 1.0.1
+    "@services/utilities-queue": ^1.1.1
+    "@services/utilities-storage": ^1.0.2
     "@types/express": ^4.17.13
     "@types/jest": 29.5.0
     "@types/node": 18.15.11
@@ -3507,7 +3507,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@services/common@1.0.0, @services/common@workspace:packages/common":
+"@services/common@^1.0.1, @services/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@services/common@workspace:packages/common"
   dependencies:
@@ -3547,11 +3547,11 @@ __metadata:
     "@nestjs/swagger": ^6.3.0
     "@nestjs/testing": ^9.0.0
     "@services/adapter": "workspace:^"
-    "@services/common": 1.0.0
+    "@services/common": ^1.0.1
     "@services/common-helpers": "workspace:^"
-    "@services/utilities-functions": 1.0.1
-    "@services/utilities-queue": 1.1.0
-    "@services/utilities-storage": 1.0.1
+    "@services/utilities-functions": ^1.0.2
+    "@services/utilities-queue": ^1.1.1
+    "@services/utilities-storage": ^1.0.2
     "@types/express": ^4.17.13
     "@types/jest": 29.5.0
     "@types/node": 18.15.11
@@ -3592,7 +3592,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@services/utilities-functions@1.0.1, @services/utilities-functions@workspace:packages/utilities/functions":
+"@services/utilities-functions@^1.0.2, @services/utilities-functions@workspace:packages/utilities/functions":
   version: 0.0.0-use.local
   resolution: "@services/utilities-functions@workspace:packages/utilities/functions"
   dependencies:
@@ -3603,7 +3603,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@services/utilities-queue@1.1.0, @services/utilities-queue@workspace:packages/utilities/queue":
+"@services/utilities-queue@^1.1.1, @services/utilities-queue@workspace:packages/utilities/queue":
   version: 0.0.0-use.local
   resolution: "@services/utilities-queue@workspace:packages/utilities/queue"
   dependencies:
@@ -3614,7 +3614,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@services/utilities-storage@1.0.1, @services/utilities-storage@workspace:packages/utilities/storage":
+"@services/utilities-storage@^1.0.2, @services/utilities-storage@workspace:packages/utilities/storage":
   version: 0.0.0-use.local
   resolution: "@services/utilities-storage@workspace:packages/utilities/storage"
   dependencies:

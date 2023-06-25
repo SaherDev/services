@@ -1,6 +1,6 @@
 {
   "name": "@services/files-service",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "author": "",
   "private": true,
@@ -30,7 +30,7 @@
     "@nestjs/platform-fastify": "^9.4.0",
     "@nestjs/swagger": "^6.3.0",
     "@services/adapter": "workspace:^",
-    "@services/common": "^1.0.1",
+    "@services/common": "^1.0.2",
     "@services/common-helpers": "workspace:^",
     "@services/utilities-functions": "^1.0.2",
     "@services/utilities-queue": "^1.1.1",

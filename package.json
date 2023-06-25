@@ -7,10 +7,8 @@
     "packages/utilities/*"
   ],
   "scripts": {
-    "build": "yarn workspaces foreach -pt run build",
-    "build:lerna": "lerna run build --parallel",
-    "version": "lerna version",
-    "add:package": "yarn workspace @services/package-name add typescript --dev"
+    "build": "npx nx run-many -t build",
+    "version": "lerna version"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -25,6 +23,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "lerna": "^6.6.1",
+    "nx": "^16.4.0",
     "prettier": "^2.8.7",
     "typescript": "^4.7.4"
   },

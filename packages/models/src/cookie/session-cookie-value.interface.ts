@@ -5,5 +5,4 @@ export interface ISessionCookieValue {
   decoded: boolean;
   accessToken: IRefreshToken | string;
   refreshToken: IAccessToken | string;
-  test?: string;
 }

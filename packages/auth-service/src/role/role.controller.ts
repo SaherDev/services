@@ -12,13 +12,13 @@ export class RoleController {
 
   @Post('role')
   @Serialize(RoleDto)
-  createRole(@Body() role: CreateRoleDto): Promise<RoleDto> {
+  async createRole(@Body() role: CreateRoleDto): Promise<RoleDto> {
     return this.rolesService.createRole(role.name, role.permissions);
   }
 
   @Put(':id')
   @Serialize(RoleDto)
-  updateRole(
+  async updateRole(
     @Param('id') id: string,
     @Body() role: UpdateRoleDto
   ): Promise<RoleDto> {

@@ -29,7 +29,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  signUp(@Body() user: CreateUserDto): Promise<UserDto> {
+  async signUp(@Body() user: CreateUserDto): Promise<UserDto> {
     return this.authService.signUp(
       user.userName,
       user.password,
@@ -40,14 +40,14 @@ export class AuthController {
 
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  signIn(@Body() user: SignInDto): Promise<UserDto> {
+  async signIn(@Body() user: SignInDto): Promise<UserDto> {
     return this.authService.signIn(user.userName, user.password);
   }
 
   @Post('user/:username/role')
   @AuthenticationRequired()
   @AuthorizationRequired([UserPermission.Update])
-  associateRoleWithUser(
+  async associateRoleWithUser(
     @Param('username') userName: string,
     @Body() body: associateRoleWithUserDto
   ): Promise<UserDto> {
@@ -56,7 +56,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refreshToken(): Promise<UserDto> {
+  async refreshToken(): Promise<UserDto> {
     return this.authService.refreshToken();
   }
   // @Post('me')

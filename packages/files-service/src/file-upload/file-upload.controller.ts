@@ -29,6 +29,11 @@ export class FileUploadController {
     return this.fileUploadService.getFile(fileId);
   }
 
+  @Get('signed-url/:id')
+  getSignedUrl(@Param('id') fileId: string): Promise<any> {
+    return this.fileUploadService.getSignedUrl(fileId);
+  }
+
   @Post('move-file')
   @Serialize(FileDto)
   //ONLY WITH @EXPOSE()

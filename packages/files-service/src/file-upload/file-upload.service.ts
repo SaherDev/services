@@ -16,6 +16,10 @@ export class FileUploadService {
     @Inject(FILES_RETRIEVER) private readonly filesRetriever: IFilesRetriever
   ) {}
 
+  async getSignedUrl(key: string): Promise<string> {
+    return await this.filesRetriever.getSignedUrl(key);
+  }
+
   async getFile(key: Readonly<string>): Promise<any> {
     let getFileResponse;
     let error: any = null;

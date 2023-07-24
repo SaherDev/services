@@ -5,11 +5,17 @@ import {
   PutObjectCommandOutput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { IStorage, StorageObjectType } from '@/models';
+import {
+  IStorage,
+  IStoragePresigner,
+  StorageCommand,
+  StorageObjectType,
+} from '../models';
 
 import { fromIni } from '@aws-sdk/credential-providers';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-export class S3 implements IStorage {
+export class S3 implements IStorage, IStoragePresigner {
   private client: S3Client;
   private ready: boolean;
 
@@ -49,6 +55,39 @@ export class S3 implements IStorage {
     this.ready = true;
 
     return this.client as T;
+  }
+
+  async getSignedUrl(
+    bucketName: Readonly<string>,
+    key: Readonly<string>,
+    command: Readonly<StorageCommand> = StorageCommand.Get,
+    expiresIn: Readonly<number> = 15 * 60
+  ): Promise<string> {
+    if (!this.ready) throw new Error('not ready');
+
+    if (!bucketName || !key)
+      throw new Error(
+        `fields are missing >>  bucketName = ${bucketName} , key = ${key}'`
+      );
+
+    try {
+      const url = await getSignedUrl(
+        this.client,
+        new GetObjectCommand({
+          Bucket: bucketName,
+          Key: key,
+        }),
+        { expiresIn }
+      );
+
+      return url;
+    } catch (error) {
+      throw new Error(
+        `failed to get signed URL >> bucketName = ${bucketName}, key = ${key}, error = ${JSON.stringify(
+          error
+        )}`
+      );
+    }
   }
 
   async putObject<T>(

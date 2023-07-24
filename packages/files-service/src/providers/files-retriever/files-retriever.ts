@@ -2,7 +2,13 @@ import { fileUuid } from '@services/common';
 import { ConfigService } from '@nestjs/config';
 import { IFilesRetriever } from './files-retriever.interface';
 import { Inject, Injectable } from '@nestjs/common';
-import { IStorage, STORAGE } from '@services/utilities-storage';
+import {
+  IStorage,
+  IStoragePresigner,
+  STORAGE,
+  StorageCommand,
+  STORAGE_PRESIGNER,
+} from '@services/utilities-storage';
 import * as path from 'path';
 import { ENV_CONFIG_FILE_PATH } from '@/config';
 
@@ -12,6 +18,8 @@ export class FilesRetriever implements IFilesRetriever {
   private storageProvider = '';
   constructor(
     @Inject(STORAGE) private readonly storageUtil: IStorage,
+    @Inject(STORAGE_PRESIGNER)
+    private readonly storagePresignerUtil: IStoragePresigner,
     private readonly configServe: ConfigService
   ) {
     // this.storageProvider = "googleDrive";
@@ -21,6 +29,14 @@ export class FilesRetriever implements IFilesRetriever {
 
     this.bucket = this.configServe.get<string>(
       `environment.storage.${this.storageProvider}.bucket`
+    );
+  }
+
+  async getSignedUrl(key: string): Promise<string> {
+    return await this.storagePresignerUtil.getSignedUrl(
+      this.bucket,
+      key,
+      StorageCommand.Get
     );
   }
 

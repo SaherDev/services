@@ -21,15 +21,15 @@ export async function createInstance() {
 
   const configService: ConfigService = app.get(ConfigService);
 
-  if (configService.get<string>('environment.type') !== 'dev') {
-    const config = new DocumentBuilder()
-      .setTitle('auth-service')
-      .setDescription('auth service for user authentication')
-      .setVersion('1.0')
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
-  }
+  // if (configService.get<string>('environment.type') !== 'dev') {
+  //   const config = new DocumentBuilder()
+  //     .setTitle('auth-service')
+  //     .setDescription('auth service for user authentication')
+  //     .setVersion('1.0')
+  //     .build();
+  //   const document = SwaggerModule.createDocument(app, config);
+  //   SwaggerModule.setup('api', app, document);
+  // }
 
   app.useLogger(
     getLogLevels(configService.get<string>('environment.type') === 'prod')

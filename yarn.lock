@@ -1914,6 +1914,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/aws-lambda@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "@fastify/aws-lambda@npm:3.4.2"
+  checksum: 54328c349f976550ce0269d13a8816b282a8939e138c9ff6aab5adea999a3e7de4e64dd9cbc15700ca104b1223f471f157955bc7347973dbcce38b4955c55cfe
+  languageName: node
+  linkType: hard
+
 "@fastify/busboy@npm:^1.0.0":
   version: 1.2.1
   resolution: "@fastify/busboy@npm:1.2.1"
@@ -3501,6 +3508,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@services/auth-service@workspace:packages/auth-service"
   dependencies:
+    "@fastify/aws-lambda": ^3.4.2
     "@fastify/secure-session": ^6.1.0
     "@fastify/static": ^6.10.1
     "@hapi/joi": ^17.1.1

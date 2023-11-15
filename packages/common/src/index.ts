@@ -5,3 +5,4 @@ export * from './guards';
 export * from './decorators';
 export * from './auth';
 export * from './models';
+export * from './filter';

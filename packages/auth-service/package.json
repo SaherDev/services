@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@fastify/aws-lambda": "^3.4.2",
     "@fastify/secure-session": "^6.1.0",
     "@fastify/static": "^6.10.1",
     "@hapi/joi": "^17.1.1",

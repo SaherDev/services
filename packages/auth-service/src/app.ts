@@ -3,13 +3,13 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import fastify, { FastifyInstance } from 'fastify';
+import { FastifyInstance, fastify } from 'fastify';
+import { HttpExceptionFilter, getLogLevels } from '@services/common';
 
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { getLogLevels } from '@services/common';
 import secureSession from '@fastify/secure-session';
 
 export async function createInstance() {
@@ -19,16 +19,17 @@ export async function createInstance() {
     new FastifyAdapter(instance)
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('auth-service')
-    .setDescription('auth service for user authentication')
-    .setVersion('1.0')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
   const configService: ConfigService = app.get(ConfigService);
+
+  if (configService.get<string>('environment.type') !== 'dev') {
+    const config = new DocumentBuilder()
+      .setTitle('auth-service')
+      .setDescription('auth service for user authentication')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+  }
 
   app.useLogger(
     getLogLevels(configService.get<string>('environment.type') === 'prod')
@@ -46,6 +47,8 @@ export async function createInstance() {
     },
   });
 
+  app.useGlobalFilters(new HttpExceptionFilter());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -55,5 +58,6 @@ export async function createInstance() {
         configService.get<string>('environment.type') !== 'prod',
     })
   );
+
   return { instance, app, configService };
 }

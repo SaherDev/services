@@ -1,4 +1,12 @@
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda';
+
+import { FastifyInstance } from 'fastify';
 import { createInstance } from './app';
+import fastifyAWSLambda from '@fastify/aws-lambda';
 
 async function bootstrap() {
   const { app, configService } = await createInstance();
@@ -13,5 +21,21 @@ async function bootstrap() {
       );
     });
 }
+
+let cachedInstance: FastifyInstance;
+
+export const handler = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  if (!cachedInstance) {
+    const { app, instance } = await createInstance();
+    await app.init();
+    cachedInstance = instance;
+  }
+
+  const proxy = fastifyAWSLambda(cachedInstance);
+  return proxy(event, context);
+};
 
 bootstrap();

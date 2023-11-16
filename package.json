@@ -7,7 +7,7 @@
     "packages/utilities/*"
   ],
   "scripts": {
-    "build": "npx nx run-many -t build",
+    "build": "npx nx run-many -t build --prod",
     "publish": "yarn lerna publish"
   },
   "devDependencies": {

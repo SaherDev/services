@@ -11,7 +11,6 @@
     "publish": "yarn lerna publish"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.0.0",
     "@types/node": "^17.0.24",
     "@yarnpkg/pnpify": "^4.0.0-rc.42",
     "eslint": "^8.38.0",

@@ -1,0 +1,26 @@
+{
+  "keepExistingTerminalsOpen": false,
+  "runOnStartup": true,
+  "terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "@services/files-service",
+          "commands": [
+            "source ~/.bash_profile",
+            "cd packages/files-service",
+            "yarn start:dev"
+          ]
+        },
+        {
+          "name": "@services/auth-service",
+          "commands": [
+            "source ~/.bash_profile",
+            "cd packages/auth-service",
+            "yarn start:dev"
+          ]
+        }
+      ]
+    }
+  ]
+}

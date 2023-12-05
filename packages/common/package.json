@@ -1,0 +1,31 @@
+{
+  "name": "@services/common",
+  "version": "1.0.2",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn tsc --build"
+  },
+  "dependencies": {
+    "@fastify/multipart": "^7.6.0",
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.1",
+    "@nestjs/core": "^9.0.0",
+    "@nestjs/jwt": "^10.0.3",
+    "@nestjs/swagger": "^6.3.0",
+    "@services/models": "workspace:^",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "fastify": "^4.15.0",
+    "js-yaml": "^4.1.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.24",
+    "typescript": "^4.7.4"
+  }
+}

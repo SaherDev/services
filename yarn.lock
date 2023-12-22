@@ -3558,6 +3558,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@services/collections-aggregator@workspace:packages/utilities/collections-aggregator":
+  version: 0.0.0-use.local
+  resolution: "@services/collections-aggregator@workspace:packages/utilities/collections-aggregator"
+  dependencies:
+    "@types/node": ^17.0.24
+    mongoose: ^7.0.4
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
 "@services/common-helpers@workspace:^, @services/common-helpers@workspace:packages/utilities/common-helpers":
   version: 0.0.0-use.local
   resolution: "@services/common-helpers@workspace:packages/utilities/common-helpers"

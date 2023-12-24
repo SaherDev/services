@@ -1,11 +1,17 @@
 import {
+  ComponentModel,
   IComponentClassType,
   IComponentModel,
   IComponentsMeta,
 } from '@/models';
 
 export class ComponentsFactory {
-  constructor() {}
+  constructor(
+    private readonly _componentClassTypeDictionary: Record<
+      string,
+      IComponentClassType
+    >
+  ) {}
 
   public async createComponents(
     startName: Readonly<string>,
@@ -40,8 +46,25 @@ export class ComponentsFactory {
         `ComponentsFactory >> createComponents failed , meta config not found for ${startName} `
       );
 
+    try {
+      const _class = this._createComponentClassType(entry.classTypeName);
+      _class.validate(rawData);
+    } catch (error) {
+      throw new Error(
+        `ComponentsFactory >> createComponents failed , ${error.message} `
+      );
+    }
+
+    const componentModel: IComponentModel = new ComponentModel(
+      startName,
+      entry.collection
+    );
+
     return ['', {}];
   }
 
-  private _createComponentClassType(name: string) {}
+  private _createComponentClassType(name: string) {
+    const _class = this._componentClassTypeDictionary[name];
+    return _class;
+  }
 }

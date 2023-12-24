@@ -1,6 +1,7 @@
 export interface IComponentModel {
-  readonly id: string;
-  readonly entry: string;
+  id: string;
+  get collection(): string;
+  get key(): string;
+  get entry(): string;
   getData(): any;
-  [key: string]: any;
 }

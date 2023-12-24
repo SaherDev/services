@@ -16,9 +16,9 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SESSION_DECODER, uuid, ISessionDecoder } from '@services/common';
+import { SESSION_DECODER, ISessionDecoder } from '@services/common';
 import { IRefreshToken, UserSession } from '@services/models';
-
+import { uuid } from '@services/common-helpers';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);

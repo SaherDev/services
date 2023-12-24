@@ -1,5 +1,4 @@
-import { fromPairs } from 'lodash';
-
+export * from './uuid';
 export * from './untrusted-code.service';
 export * from './object-fields-accessor.service';
 export * from './http.service';

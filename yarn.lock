@@ -3523,6 +3523,7 @@ __metadata:
     "@nestjs/swagger": ^6.3.0
     "@nestjs/testing": ^9.0.0
     "@services/common": ^1.0.2
+    "@services/common-helpers": 1.1.1
     "@services/models": "workspace:^"
     "@services/utilities-queue": ^1.1.1
     "@services/utilities-storage": ^1.0.2
@@ -3568,7 +3569,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@services/common-helpers@workspace:^, @services/common-helpers@workspace:packages/utilities/common-helpers":
+"@services/common-helpers@1.1.1, @services/common-helpers@workspace:^, @services/common-helpers@workspace:packages/utilities/common-helpers":
   version: 0.0.0-use.local
   resolution: "@services/common-helpers@workspace:packages/utilities/common-helpers"
   dependencies:
@@ -3577,6 +3578,7 @@ __metadata:
     axios: ^1.4.0
     lodash: ^4.17.21
     typescript: ^4.7.4
+    uuid: ^9.0.0
     vm2: ^3.9.19
   languageName: unknown
   linkType: soft
@@ -3591,6 +3593,7 @@ __metadata:
     "@nestjs/core": ^9.0.0
     "@nestjs/jwt": ^10.0.3
     "@nestjs/swagger": ^6.3.0
+    "@services/common-helpers": 1.1.1
     "@services/models": "workspace:^"
     "@types/node": ^17.0.24
     class-transformer: ^0.5.1
@@ -3600,7 +3603,6 @@ __metadata:
     reflect-metadata: ^0.1.13
     rxjs: ^7.2.0
     typescript: ^4.7.4
-    uuid: ^9.0.0
   languageName: unknown
   linkType: soft
 

@@ -143,6 +143,14 @@ export class ComponentsFactory {
         component[key] = rawData[key];
       }
     }
+
+    const key = component.key;
+    const existingComponent = finalResult[key];
+    if (existingComponent) {
+      component.id = existingComponent.id;
+    } else {
+      finalResult[key] = component;
+    }
   }
 
   private _createComponentClassType(name: string): IComponentClassType {

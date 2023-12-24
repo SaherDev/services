@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { uuid } from '@services/common';
+import { uuid } from '@services/common-helpers';
 
 @Injectable()
 export class RoleService {

@@ -1,23 +1,27 @@
+import { hash, uuid } from '@services/common-helpers';
+
 import { IComponentModel } from './component-model.interface';
-import { uuid } from '@services/common-helpers';
 
 export class ComponentModel implements IComponentModel {
   public id: string;
   public collection: string;
-  public entry: string;
+  public name: string;
   private dictionary: Record<string, any>;
   constructor(entry: string, collection: string) {
-    this.entry = entry;
+    this.name = entry?.split('.').at(-1) ?? entry;
     this.collection = collection;
     this.id = uuid();
     this.dictionary = {};
   }
 
   get key(): string {
-    return Object.keys(this.dictionary)
+    return Object.keys({
+      ...this.dictionary,
+      collection: this.collection,
+    })
       .sort()
-      .map((key) => `${key}:${this.dictionary[key]}`)
-      .join('#');
+      .map((key) => `${key}:${JSON.stringify(this.dictionary[key])}`)
+      .join('#_#');
   }
 
   set(key: string, value: any): void {

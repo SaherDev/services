@@ -3,7 +3,7 @@ import {
   IComponentClassType,
   IComponentModel,
   IComponentsMeta,
-} from '@/models';
+} from '../models';
 
 type ClassType = new (...args: any[]) => IComponentClassType;
 
@@ -48,6 +48,14 @@ export class ComponentsFactory {
       rawData,
       result
     );
+
+    const key = component.key;
+    const existingComponent = result[key];
+    if (existingComponent) {
+      component.id = existingComponent.id;
+    } else {
+      result[key] = component;
+    }
 
     return [component.id, result];
   }
@@ -98,13 +106,13 @@ export class ComponentsFactory {
     rawData: any,
     finalResult: Record<string, IComponentModel>
   ): Promise<void> {
-    for (const key of Object.keys(rawData)) {
-      if (_class.isAChild(key) && typeof rawData[key] === 'object') {
+    for (const [key] of Object.entries(rawData)) {
+      if (_class.isAChild(key) && Array.isArray(rawData[key])) {
         component.set(key, []);
         for (const child of rawData[key]) {
           if (typeof child === 'object') {
             const [childId, childResult] = await this._createComponents(
-              `${component.entry}.${key}`,
+              `${component.name}.${key}`,
               metaConfig,
               child,
               finalResult
@@ -117,7 +125,7 @@ export class ComponentsFactory {
         }
       } else if (_class.isAChild(key) && typeof rawData[key] === 'object') {
         const [childId, childResult] = await this._createComponents(
-          `${component.entry}.${key}`,
+          `${component.name}.${key}`,
           metaConfig,
           rawData[key],
           finalResult
@@ -127,14 +135,6 @@ export class ComponentsFactory {
       } else {
         component.set(key, rawData[key]);
       }
-    }
-
-    const key = component.key;
-    const existingComponent = finalResult[key];
-    if (existingComponent) {
-      component.id = existingComponent.id;
-    } else {
-      finalResult[key] = component;
     }
   }
 

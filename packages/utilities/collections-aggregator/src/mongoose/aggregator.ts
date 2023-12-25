@@ -1,5 +1,5 @@
 import { ClientSession, Collection, Connection } from 'mongoose';
-import { ICollectionsAggregator, IComponentModel } from '@/models';
+import { ICollectionsAggregator, IComponentModel } from '../models';
 
 export class MongooseAggregator implements ICollectionsAggregator {
   constructor(private readonly connection: Connection) {}

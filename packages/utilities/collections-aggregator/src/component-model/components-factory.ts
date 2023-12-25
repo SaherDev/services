@@ -17,7 +17,18 @@ export class ComponentsFactory {
     metaConfig: Record<string, IComponentsMeta>,
     rawData: any = {}
   ) {
-    return this._createComponents(startName, metaConfig, rawData);
+    const entryMetaConfig = metaConfig[startName];
+    if (!entryMetaConfig) {
+      throw new Error(
+        `ComponentsFactory >> createComponents failed, meta config not found for ${startName}`
+      );
+    }
+
+    return this._createComponents(
+      startName,
+      metaConfig,
+      rawData[entryMetaConfig.entry]
+    );
   }
 
   private async _createComponents(

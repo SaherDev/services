@@ -1,5 +1,4 @@
 export interface IComponentClassType {
-  readonly childrens: string[];
-  validate(rawData: any): boolean;
+  readonly childrenNames: string[];
   isAChild(childName: string): boolean;
 }

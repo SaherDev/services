@@ -5,12 +5,11 @@ import {
   IComponentsMeta,
 } from '@/models';
 
+type ClassType = new (...args: any[]) => IComponentClassType;
+
 export class ComponentsFactory {
   constructor(
-    private readonly _componentClassTypeDictionary: Record<
-      string,
-      IComponentClassType
-    >
+    private readonly _componentClassTypeDictionary: Record<string, ClassType>
   ) {}
 
   public createComponents(
@@ -28,9 +27,7 @@ export class ComponentsFactory {
     result: Record<string, IComponentModel> = {}
   ): Promise<[string, Record<string, IComponentModel>]> {
     const entry = this._getComponentEntry(startName, metaConfig);
-    const _class = this._createComponentClassType(entry.classTypeName);
-
-    this._validateComponentData(_class, rawData);
+    let _class = this._createComponentClassType(entry.classTypeName, rawData);
 
     const component = this._createComponentInstance(
       startName,
@@ -57,19 +54,6 @@ export class ComponentsFactory {
     }
 
     return entry;
-  }
-
-  private _validateComponentData(
-    _class: IComponentClassType,
-    rawData: any
-  ): void {
-    try {
-      _class.validate(rawData);
-    } catch (error) {
-      throw new Error(
-        `ComponentsFactory >> createComponents failed, ${error.message}`
-      );
-    }
   }
 
   private _createComponentInstance(
@@ -145,8 +129,17 @@ export class ComponentsFactory {
     }
   }
 
-  private _createComponentClassType(name: string): IComponentClassType {
-    const _class = this._componentClassTypeDictionary[name];
-    return _class;
+  private _createComponentClassType(
+    name: string,
+    rawData: any
+  ): IComponentClassType {
+    try {
+      const classType = this._componentClassTypeDictionary[name];
+      return new classType(rawData);
+    } catch (error) {
+      throw new Error(
+        `ComponentsFactory >> createComponentClassType failed, ${name} is not a valid class type`
+      );
+    }
   }
 }

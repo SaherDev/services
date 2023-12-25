@@ -104,17 +104,11 @@ export class ComponentsFactory {
     finalResult: Record<string, IComponentModel>
   ): Promise<void> {
     for (const key of Object.keys(rawData)) {
-      if (
-        _class.isAChild(key) &&
-        Array.isArray(rawData[key]) &&
-        rawData[key] !== null
-      ) {
+      if (_class.isAChild(key) && typeof rawData[key] === 'object') {
         component[key] = [];
 
         for (const child of rawData[key]) {
           if (typeof child === 'object') {
-            component[key].push(child);
-          } else {
             const [childId, childResult] = await this._createComponents(
               `${component.entry}.${key}`,
               metaConfig,
@@ -123,13 +117,11 @@ export class ComponentsFactory {
             );
             component[key].push(childId);
             Object.assign(finalResult, childResult);
+          } else {
+            component[key].push(child);
           }
         }
-      } else if (
-        _class.isAChild(key) &&
-        typeof rawData[key] === 'object' &&
-        rawData[key] !== null
-      ) {
+      } else if (_class.isAChild(key) && typeof rawData[key] === 'object') {
         const [childId, childResult] = await this._createComponents(
           `${component.entry}.${key}`,
           metaConfig,

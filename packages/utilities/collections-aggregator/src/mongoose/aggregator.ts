@@ -41,7 +41,7 @@ export class MongooseAggregator implements ICollectionsAggregator {
       for (const [_collection, components] of Object.entries(collections)) {
         const collection = this._getCollection(_collection);
         for (const component of components) {
-          await collection.insertOne(component.getData(), { session });
+          await collection.insertOne(component.getAll(), { session });
         }
       }
 

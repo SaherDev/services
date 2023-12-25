@@ -100,8 +100,7 @@ export class ComponentsFactory {
   ): Promise<void> {
     for (const key of Object.keys(rawData)) {
       if (_class.isAChild(key) && typeof rawData[key] === 'object') {
-        component[key] = [];
-
+        component.set(key, []);
         for (const child of rawData[key]) {
           if (typeof child === 'object') {
             const [childId, childResult] = await this._createComponents(
@@ -110,10 +109,10 @@ export class ComponentsFactory {
               child,
               finalResult
             );
-            component[key].push(childId);
+            component.get(key).push(childId);
             Object.assign(finalResult, childResult);
           } else {
-            component[key].push(child);
+            component.get(key).push(child);
           }
         }
       } else if (_class.isAChild(key) && typeof rawData[key] === 'object') {
@@ -123,11 +122,10 @@ export class ComponentsFactory {
           rawData[key],
           finalResult
         );
-
-        component[key] = childId;
+        component.set(key, childId);
         Object.assign(finalResult, childResult);
       } else {
-        component[key] = rawData[key];
+        component.set(key, rawData[key]);
       }
     }
 

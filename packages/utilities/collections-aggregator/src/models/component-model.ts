@@ -5,22 +5,33 @@ export class ComponentModel implements IComponentModel {
   public id: string;
   public collection: string;
   public entry: string;
+  private dictionary: Record<string, any>;
   constructor(entry: string, collection: string) {
     this.entry = entry;
     this.collection = collection;
     this.id = uuid();
-  }
-
-  getData(): Omit<ComponentModel, 'collection' | 'entry'> {
-    let result: Omit<ComponentModel, 'collection' | 'entry'> = { ...this };
-    return result;
+    this.dictionary = {};
   }
 
   get key(): string {
-    const keys = Object.keys(this).filter((key) => key !== 'id');
-    return keys
+    return Object.keys(this.dictionary)
       .sort()
-      .map((key) => `${key}:${this[key]}`)
+      .map((key) => `${key}:${this.dictionary[key]}`)
       .join('#');
+  }
+
+  set(key: string, value: any): void {
+    this.dictionary[key] = value;
+  }
+
+  get(key: string): any {
+    return this.dictionary[key];
+  }
+
+  getAll(): any {
+    return {
+      ...this.dictionary,
+      id: this.id,
+    };
   }
 }

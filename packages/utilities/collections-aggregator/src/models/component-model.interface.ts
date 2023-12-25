@@ -1,7 +1,9 @@
 export interface IComponentModel {
-  id: string;
   get collection(): string;
   get key(): string;
   get entry(): string;
-  getData(): any;
+  id: string;
+  set(key: string, value: any): void;
+  get(key: string): any;
+  getAll(): any;
 }

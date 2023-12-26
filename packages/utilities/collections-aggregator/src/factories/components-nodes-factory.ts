@@ -12,7 +12,7 @@ export class ComponentsNodesFactory {
     private readonly _componentClassTypeDictionary: Record<string, ClassType>
   ) {}
 
-  public createComponents(
+  public createComponentsNodes(
     startName: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
     rawData: any = {}

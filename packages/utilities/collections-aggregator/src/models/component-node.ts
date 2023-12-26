@@ -11,11 +11,13 @@ export class ComponentNode implements IComponentNode {
   }
 
   get key(): string {
-    return `${Object.keys(this)
-      .filter((key) => key !== 'id')
-      .sort()
-      .map((key) => `${key}:${JSON.stringify(this[key])}`)
-      .join('#_#')}`;
+    return hash(
+      `${Object.keys(this)
+        .filter((key) => key !== 'id')
+        .sort()
+        .map((key) => `${key}:${JSON.stringify(this[key])}`)
+        .join('#_#')}`
+    );
   }
 
   getAll(): any {

@@ -43,45 +43,18 @@ export class ComponentsNodesFactory {
 
     const componentNode: IComponentNode = new ComponentNode(entry.collection);
 
-    for (const [key, value] of Object.entries(rawData)) {
-      if (_class.isAChild(key) && typeof value === 'object') {
-        if (Array.isArray(value)) {
-          componentNode[key] = [];
-          for (const child of value) {
-            if (typeof child === 'object') {
-              const [childId, childResult] = await this._createComponentsNodes(
-                `${entry.name}.${key}`,
-                metaConfig,
-                child,
-                result
-              );
-              componentNode[key].push(childId);
-              Object.assign(result, childResult);
-            } else {
-              componentNode[key].push(child);
-            }
-          }
-        } else if (typeof value === 'object') {
-          const [childId, childResult] = await this._createComponentsNodes(
-            `${entry.name}.${key}`,
-            metaConfig,
-            value,
-            result
-          );
-
-          componentNode[key] = childId;
-          Object.assign(result, childResult);
-        }
-      } else if (
-        !this._whitelist ||
-        (this._whitelist && _class.isAChild(key))
-      ) {
-        componentNode[key] = value;
-      }
-    }
+    await this._processRawData(
+      entry,
+      metaConfig,
+      rawData,
+      _class,
+      componentNode,
+      result
+    );
 
     const key = componentNode.key;
     const existingComponent = result[key];
+
     if (existingComponent) {
       componentNode.id = existingComponent.id;
     } else {
@@ -89,6 +62,112 @@ export class ComponentsNodesFactory {
     }
 
     return [componentNode.id, result];
+  }
+
+  private async _processRawData(
+    entry: IComponentsMeta,
+    metaConfig: Record<string, IComponentsMeta>,
+    rawData: any,
+    _class: IComponentClassType,
+    componentNode: IComponentNode,
+    result: Record<string, IComponentNode>
+  ): Promise<void> {
+    for (const [key, value] of Object.entries(rawData)) {
+      if (_class.isAChild(key) && typeof value === 'object') {
+        await this._processChildNode(
+          entry,
+          metaConfig,
+          key,
+          value,
+          _class,
+          componentNode,
+          result
+        );
+      } else if (
+        !this._whitelist ||
+        (this._whitelist && _class.isAChild(key))
+      ) {
+        componentNode[key] = value;
+      }
+    }
+  }
+
+  private async _processChildNode(
+    entry: IComponentsMeta,
+    metaConfig: Record<string, IComponentsMeta>,
+    childKey: string,
+    childValue: any,
+    _class: IComponentClassType,
+    componentNode: IComponentNode,
+    result: Record<string, IComponentNode>
+  ): Promise<void> {
+    if (Array.isArray(childValue)) {
+      await this._processArrayChildNode(
+        entry,
+        metaConfig,
+        childKey,
+        childValue,
+        _class,
+        componentNode,
+        result
+      );
+    } else if (typeof childValue === 'object') {
+      await this._processObjectChildNode(
+        entry,
+        metaConfig,
+        childKey,
+        childValue,
+        _class,
+        componentNode,
+        result
+      );
+    }
+  }
+
+  private async _processArrayChildNode(
+    entry: IComponentsMeta,
+    metaConfig: Record<string, IComponentsMeta>,
+    childKey: string,
+    childArray: any[],
+    _class: IComponentClassType,
+    componentNode: IComponentNode,
+    result: Record<string, IComponentNode>
+  ): Promise<void> {
+    componentNode[childKey] = [];
+    for (const child of childArray) {
+      if (typeof child === 'object') {
+        const [childId, childResult] = await this._createComponentsNodes(
+          `${entry.name}.${childKey}`,
+          metaConfig,
+          child,
+          result
+        );
+        componentNode[childKey].push(childId);
+        Object.assign(result, childResult);
+      } else {
+        componentNode[childKey].push(child);
+      }
+    }
+  }
+
+  private async _processObjectChildNode(
+    entry: IComponentsMeta,
+    metaConfig: Record<string, IComponentsMeta>,
+    childKey: string,
+    childObject: any,
+    _class: IComponentClassType,
+    componentNode: IComponentNode,
+    result: Record<string, IComponentNode>
+  ): Promise<void> {
+    const [childId, childResult] = await this._createComponentsNodes(
+      `${entry.name}.${childKey}`,
+      metaConfig,
+      childObject,
+      result
+    );
+
+    componentNode[childKey] = childId;
+    Object.assign(result, childResult);
   }
 
   private _getComponentNodeMeta(

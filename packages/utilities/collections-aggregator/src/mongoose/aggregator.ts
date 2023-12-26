@@ -1,5 +1,5 @@
 import { ClientSession, Collection, Connection } from 'mongoose';
-import { ICollectionsAggregator, IComponentModel } from '../models';
+import { ICollectionsAggregator, IComponentNode } from '../models';
 
 export class MongooseAggregator implements ICollectionsAggregator {
   constructor(private readonly connection: Connection) {}
@@ -16,9 +16,9 @@ export class MongooseAggregator implements ICollectionsAggregator {
   }
 
   private _groupComponentsByCollection(
-    components: IComponentModel[]
-  ): Record<string, IComponentModel[]> {
-    const collections: Record<string, IComponentModel[]> = {};
+    components: IComponentNode[]
+  ): Record<string, IComponentNode[]> {
+    const collections: Record<string, IComponentNode[]> = {};
     for (const item of components) {
       const arr = collections[item.collection] ?? [];
       arr.push(item);
@@ -28,9 +28,9 @@ export class MongooseAggregator implements ICollectionsAggregator {
   }
 
   async setComponentsData(
-    components: IComponentModel[]
+    components: IComponentNode[]
   ): Promise<Record<string, any>> {
-    const collections: Record<string, IComponentModel[]> =
+    const collections: Record<string, IComponentNode[]> =
       this._groupComponentsByCollection(components);
 
     const session = await this._startSession();
@@ -57,7 +57,7 @@ export class MongooseAggregator implements ICollectionsAggregator {
 
   async getComponentsData(
     collection: string,
-    components: IComponentModel[]
+    components: IComponentNode[]
   ): Promise<[string, Record<string, any>]> {
     throw new Error('Method not implemented.');
   }

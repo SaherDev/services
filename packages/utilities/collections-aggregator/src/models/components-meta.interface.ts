@@ -1,5 +1,5 @@
 export interface IComponentsMeta {
-  readonly entry: string;
+  readonly name: string;
   readonly collection: string;
   readonly classTypeName: string;
 }

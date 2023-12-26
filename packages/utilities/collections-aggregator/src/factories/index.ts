@@ -1,1 +1,1 @@
-export * from './components-factory';
+export * from './components-nodes-factory';

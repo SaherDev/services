@@ -9,7 +9,8 @@ type ClassType = new (...args: any[]) => IComponentClassType;
 
 export class ComponentsNodesFactory {
   constructor(
-    private readonly _componentClassTypeDictionary: Record<string, ClassType>
+    private readonly _componentClassTypeDictionary: Record<string, ClassType>,
+    private readonly _whitelist: boolean = false
   ) {}
 
   public createComponentsNodes(
@@ -71,7 +72,10 @@ export class ComponentsNodesFactory {
           componentNode[key] = childId;
           Object.assign(result, childResult);
         }
-      } else {
+      } else if (
+        !this._whitelist ||
+        (this._whitelist && _class.isAChild(key))
+      ) {
         componentNode[key] = value;
       }
     }

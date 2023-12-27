@@ -49,8 +49,11 @@ export class MongooseAggregator implements ICollectionsAggregator {
     metaConfig: Record<string, IComponentsMeta>,
     data: any = {}
   ): Promise<[string, Array<any>]> {
-    const [rootId, _, childNodes] =
-      await this._factory.splitIntoComponentsNodes(name, metaConfig, data);
+    const [rootId, childNodes] = await this._factory.splitIntoComponentsNodes(
+      name,
+      metaConfig,
+      data
+    );
 
     const groupedNodes: Record<string, IComponentNode[]> =
       this._groupComponentsByCollection(Object.values(childNodes));

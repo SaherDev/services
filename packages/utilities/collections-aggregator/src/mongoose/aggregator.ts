@@ -185,7 +185,7 @@ export class MongooseAggregator implements ICollectionsAggregator {
     for (const [key, value] of Object.entries(
       typeof node === 'object' ? node : {}
     )) {
-      const metaKey = `${name}.${key}`;
+      const metaKey = `${name?.split('.')?.at(-1) ?? name}.${key}`;
       const meta = metaConfig[metaKey];
       if (!meta) continue;
       const isArray: boolean = Array.isArray(value);

@@ -46,19 +46,32 @@ export class ComponentsNodesFactory {
     return map;
   }
 
-  public async buildComponentNodes(
+  public async toComponentClass(
     startName: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
     data = {}
-  ): Promise<any> {
-    return {};
+  ): Promise<IComponentClassType> {
+    const entryMetaConfig = metaConfig[startName];
+    if (!entryMetaConfig) {
+      throw new Error(
+        `ComponentsFactory >> toComponentClass failed, meta config not found for ${startName}`
+      );
+    }
+
+    const [, _class] = await this._createComponentsNodes(
+      startName,
+      metaConfig,
+      data[entryMetaConfig.name]
+    );
+
+    return _class;
   }
 
   public async splitIntoComponentsNodes(
     startName: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
     rawData: any = {}
-  ): Promise<[string, IComponentClassType, Record<string, IComponentNode>]> {
+  ): Promise<[string, Record<string, IComponentNode>]> {
     const entryMetaConfig = metaConfig[startName];
     if (!entryMetaConfig) {
       throw new Error(
@@ -66,11 +79,13 @@ export class ComponentsNodesFactory {
       );
     }
 
-    return this._createComponentsNodes(
+    const [id, _, result] = await this._createComponentsNodes(
       startName,
       metaConfig,
       rawData[entryMetaConfig.name]
     );
+
+    return [id, result];
   }
 
   private async _createComponentsNodes(

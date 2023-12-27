@@ -175,6 +175,7 @@ export class ComponentsNodesFactory {
     result: Record<string, IComponentNode>
   ): Promise<void> {
     componentNode[childKey] = [];
+    _class[childKey] = [];
     for (const child of childArray) {
       if (typeof child === 'object') {
         const [childId, _childClass, childResult] =
@@ -184,7 +185,7 @@ export class ComponentsNodesFactory {
             child,
             result
           );
-        _class[childKey] = _childClass;
+        _class[childKey].push(_childClass);
         componentNode[childKey].push(childId);
         Object.assign(result, childResult);
       } else {

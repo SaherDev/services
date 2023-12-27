@@ -6,18 +6,59 @@ import {
 } from '../models';
 
 type ClassType = new (...args: any[]) => IComponentClassType;
-
+const META_KEY_SEPARATOR = '.';
 export class ComponentsNodesFactory {
   constructor(
     private readonly _componentClassTypeDictionary: Record<string, ClassType>,
     private readonly _whitelist: boolean = false
   ) {}
 
-  public createComponentsNodes(
+  public buildMetaDictionaryTree(
+    startName: Readonly<string>,
+    metaConfig: Record<string, IComponentsMeta>
+  ): Map<string, string[]> {
+    const entry: IComponentsMeta = this._getComponentNodeMeta(
+      startName,
+      metaConfig
+    );
+
+    const queue = [entry.name];
+    const map = new Map<string, string[]>();
+    const metaConfigCopy = { ...metaConfig };
+    while (queue.length) {
+      const currentNode = queue.shift();
+
+      for (const [key, _] of Object.entries(metaConfigCopy)) {
+        if (
+          key.split(META_KEY_SEPARATOR)?.[0] === currentNode &&
+          currentNode !== key
+        ) {
+          const childNode = key.split(META_KEY_SEPARATOR)?.at(-1);
+          const parent = map.get(currentNode) ?? [];
+          parent.push(childNode);
+          map.set(currentNode, parent);
+          queue.push(childNode);
+          delete metaConfigCopy[key];
+        }
+      }
+    }
+
+    return map;
+  }
+
+  public async buildComponentNodes(
+    startName: Readonly<string>,
+    metaConfig: Record<string, IComponentsMeta>,
+    data = {}
+  ): Promise<any> {
+    return {};
+  }
+
+  public async splitIntoComponentsNodes(
     startName: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
     rawData: any = {}
-  ) {
+  ): Promise<[string, IComponentClassType, Record<string, IComponentNode>]> {
     const entryMetaConfig = metaConfig[startName];
     if (!entryMetaConfig) {
       throw new Error(
@@ -37,7 +78,7 @@ export class ComponentsNodesFactory {
     metaConfig: Record<string, IComponentsMeta>,
     rawData: any,
     result: Record<string, IComponentNode> = {}
-  ): Promise<[string, Record<string, IComponentNode>]> {
+  ): Promise<[string, IComponentClassType, Record<string, IComponentNode>]> {
     const entry = this._getComponentNodeMeta(startName, metaConfig);
     let _class = this._createComponentClassType(entry.classTypeName, rawData);
 
@@ -61,7 +102,7 @@ export class ComponentsNodesFactory {
       result[key] = componentNode;
     }
 
-    return [componentNode.id, result];
+    return [componentNode.id, _class, result];
   }
 
   private async _processRawData(
@@ -136,12 +177,14 @@ export class ComponentsNodesFactory {
     componentNode[childKey] = [];
     for (const child of childArray) {
       if (typeof child === 'object') {
-        const [childId, childResult] = await this._createComponentsNodes(
-          `${entry.name}.${childKey}`,
-          metaConfig,
-          child,
-          result
-        );
+        const [childId, _childClass, childResult] =
+          await this._createComponentsNodes(
+            `${entry.name}${META_KEY_SEPARATOR}${childKey}`,
+            metaConfig,
+            child,
+            result
+          );
+        _class[childKey] = _childClass;
         componentNode[childKey].push(childId);
         Object.assign(result, childResult);
       } else {
@@ -159,13 +202,14 @@ export class ComponentsNodesFactory {
     componentNode: IComponentNode,
     result: Record<string, IComponentNode>
   ): Promise<void> {
-    const [childId, childResult] = await this._createComponentsNodes(
-      `${entry.name}.${childKey}`,
-      metaConfig,
-      childObject,
-      result
-    );
-
+    const [childId, _childClass, childResult] =
+      await this._createComponentsNodes(
+        `${entry.name}${META_KEY_SEPARATOR}${childKey}`,
+        metaConfig,
+        childObject,
+        result
+      );
+    _class[childKey] = _childClass;
     componentNode[childKey] = childId;
     Object.assign(result, childResult);
   }

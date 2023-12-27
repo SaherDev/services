@@ -14,7 +14,15 @@ export class MongooseAggregator implements ICollectionsAggregator {
   ) {}
 
   private _getCollection(collection: string): Collection<any> {
-    return this._connection.collection(collection);
+    const _collection = this._connection.collection(collection);
+
+    if (!_collection) {
+      throw new Error(
+        `MongooseAggregator >> _getCollection >> collection ${collection} not found`
+      );
+    }
+
+    return _collection;
   }
 
   private _startSession(): Promise<ClientSession> {
@@ -41,11 +49,8 @@ export class MongooseAggregator implements ICollectionsAggregator {
     metaConfig: Record<string, IComponentsMeta>,
     data: any = {}
   ): Promise<[string, Array<any>]> {
-    const [id, childNodes] = await this._factory.createComponentsNodes(
-      name,
-      metaConfig,
-      data
-    );
+    const [rootId, _, childNodes] =
+      await this._factory.splitIntoComponentsNodes(name, metaConfig, data);
 
     const groupedNodes: Record<string, IComponentNode[]> =
       this._groupComponentsByCollection(Object.values(childNodes));
@@ -64,7 +69,7 @@ export class MongooseAggregator implements ICollectionsAggregator {
 
       await session.commitTransaction();
 
-      return [id, flattenedData];
+      return [rootId, flattenedData];
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -73,21 +78,19 @@ export class MongooseAggregator implements ICollectionsAggregator {
     }
   }
 
+  async _getDataByIds(
+    collection: Readonly<string>,
+    ids: string[]
+  ): Promise<any[] | any> {}
+
   async getData(
     name: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
-    args: any = {}
+    query: any = {}
   ): Promise<[string, Record<string, any>]> {
-    const entry = metaConfig[name];
+    const metaDictionaryTreeMap: Map<string, string[]> =
+      this._factory.buildMetaDictionaryTree(name, metaConfig);
 
-    if (!entry) {
-      throw new Error(
-        `MongooseAggregator >> getData >> ${name} is not a valid entry`
-      );
-    }
-
-    const collection = this._getCollection(entry.collection);
-
-    throw new Error('Not implemented');
+    throw new Error(`NOT IMPLEMENTED YET`);
   }
 }

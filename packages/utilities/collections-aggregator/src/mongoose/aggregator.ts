@@ -12,7 +12,20 @@ export class MongooseAggregator implements ICollectionsAggregator {
   constructor(
     private readonly _factory: ComponentsNodesFactory,
     private readonly _connection: Connection
-  ) {}
+  ) {
+    this._validate();
+  }
+
+  private _validate(): void {
+    if (
+      !(this._factory instanceof ComponentsNodesFactory) ||
+      !(this._connection instanceof Connection)
+    ) {
+      throw new Error(
+        'MongooseAggregator >> constructor failed, factory and connection are required'
+      );
+    }
+  }
 
   async set(
     name: Readonly<string>,
@@ -123,9 +136,10 @@ export class MongooseAggregator implements ICollectionsAggregator {
   ): Record<string, any> {
     const collections: Record<string, any[]> = {};
     for (const item of components) {
-      const arr = collections[item.collection] ?? [];
+      const collectionName = item['collection'];
+      const arr = collections[collectionName] ?? [];
       arr.push(item.getAll());
-      collections[item.collection] = arr;
+      collections[collectionName] = arr;
     }
     return collections;
   }

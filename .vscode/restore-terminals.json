@@ -21,6 +21,18 @@
           ]
         }
       ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "@services/libraray-service",
+          "commands": [
+            "source ~/.bash_profile",
+            "cd packages/library-service",
+            "yarn start:dev"
+          ]
+        }
+      ]
     }
   ]
 }

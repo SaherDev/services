@@ -11,7 +11,20 @@ export class ComponentsNodesFactory {
   constructor(
     private readonly _componentClassTypeDictionary: Record<string, ClassType>,
     private readonly _whitelist: boolean = false
-  ) {}
+  ) {
+    this._validate();
+  }
+
+  private _validate(): void {
+    if (
+      !this._componentClassTypeDictionary ||
+      !Object.keys(this._componentClassTypeDictionary).length
+    ) {
+      throw new Error(
+        'ComponentsFactory >> constructor failed, componentClassTypeDictionary is required'
+      );
+    }
+  }
 
   public buildMetaDictionaryTree(
     startName: Readonly<string>,

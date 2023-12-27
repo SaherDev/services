@@ -1,6 +1,7 @@
 import { ClientSession, Collection, Connection } from 'mongoose';
 import {
   ICollectionsAggregator,
+  IComponentClassType,
   IComponentNode,
   IComponentsMeta,
 } from '../models';
@@ -13,38 +14,7 @@ export class MongooseAggregator implements ICollectionsAggregator {
     private readonly _connection: Connection
   ) {}
 
-  private _getCollection(collection: string): Collection<any> {
-    const _collection = this._connection.collection(collection);
-
-    if (!_collection) {
-      throw new Error(
-        `MongooseAggregator >> _getCollection >> collection ${collection} not found`
-      );
-    }
-
-    return _collection;
-  }
-
-  private _startSession(): Promise<ClientSession> {
-    return this._connection.startSession();
-  }
-  private _endSession(session: ClientSession): Promise<void> {
-    return session.endSession();
-  }
-
-  private _groupComponentsByCollection(
-    components: IComponentNode[]
-  ): Record<string, any> {
-    const collections: Record<string, any[]> = {};
-    for (const item of components) {
-      const arr = collections[item.collection] ?? [];
-      arr.push(item.getAll());
-      collections[item.collection] = arr;
-    }
-    return collections;
-  }
-
-  async setData(
+  async set(
     name: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
     data: any = {}
@@ -81,19 +51,146 @@ export class MongooseAggregator implements ICollectionsAggregator {
     }
   }
 
-  async _getDataByIds(
-    collection: Readonly<string>,
-    ids: string[]
-  ): Promise<any[] | any> {}
-
-  async getData(
+  async find(
     name: Readonly<string>,
     metaConfig: Record<string, IComponentsMeta>,
-    query: any = {}
-  ): Promise<[string, Record<string, any>]> {
+    query: Object = {},
+    multipleResults = false
+  ): Promise<any[] | any> {
     const metaDictionaryTreeMap: Map<string, string[]> =
       this._factory.buildMetaDictionaryTree(name, metaConfig);
 
-    throw new Error(`NOT IMPLEMENTED YET`);
+    const root = metaConfig[name];
+
+    if (!root || !root.collection)
+      throw new Error(
+        `MongooseAggregator >> getData >> root ${name} not found`
+      );
+
+    const rootNodes: IComponentNode[] = await this._getCollection(
+      root.collection
+    )
+      .find<IComponentNode>(query)
+      .toArray();
+
+    if (!rootNodes.length || (rootNodes.length > 1 && !multipleResults))
+      throw new Error(
+        `MongooseAggregator >> getData >> root nodes not found for ${name}`
+      );
+
+    const result = await Promise.all(
+      rootNodes.map((node) =>
+        this._buildNode(name, metaConfig, metaDictionaryTreeMap, node)
+      )
+    );
+
+    return multipleResults ? result : result?.[0];
+  }
+
+  async findComponentClass(
+    name: Readonly<string>,
+    metaConfig: Record<string, IComponentsMeta>,
+    query: Object = {}
+  ): Promise<IComponentClassType> {
+    const data = await this.find(name, metaConfig, query);
+
+    return this._factory.toComponentClass(name, metaConfig, {
+      [name]: data,
+    });
+  }
+
+  private _getCollection(collection: string): Collection<any> {
+    const _collection = this._connection.collection(collection);
+
+    if (!_collection) {
+      throw new Error(
+        `MongooseAggregator >> _getCollection >> collection ${collection} not found`
+      );
+    }
+
+    return _collection;
+  }
+
+  private _startSession(): Promise<ClientSession> {
+    return this._connection.startSession();
+  }
+  private _endSession(session: ClientSession): Promise<void> {
+    return session.endSession();
+  }
+
+  private _groupComponentsByCollection(
+    components: IComponentNode[]
+  ): Record<string, any> {
+    const collections: Record<string, any[]> = {};
+    for (const item of components) {
+      const arr = collections[item.collection] ?? [];
+      arr.push(item.getAll());
+      collections[item.collection] = arr;
+    }
+    return collections;
+  }
+
+  private async _getDataByIds(
+    collection: Readonly<string>,
+    ids: string[]
+  ): Promise<any[]> {
+    return await this._getCollection(collection)
+      .aggregate([
+        {
+          $match: {
+            id: { $in: ids },
+          },
+        },
+        {
+          $addFields: {
+            _customOrder: {
+              $indexOfArray: [ids, '$id'],
+            },
+          },
+        },
+        {
+          $sort: {
+            _customOrder: 1,
+          },
+        },
+        {
+          $project: {
+            _customOrder: 0,
+          },
+        },
+      ])
+      .toArray();
+  }
+
+  private async _buildNode(
+    name: string,
+    metaConfig: Record<string, IComponentsMeta>,
+    metaMap: Map<string, string[]>,
+    node: any
+  ): Promise<any> {
+    for (const [key, value] of Object.entries(
+      typeof node === 'object' ? node : {}
+    )) {
+      const metaKey = `${name}.${key}`;
+      const meta = metaConfig[metaKey];
+      if (!meta) continue;
+      const isArray: boolean = Array.isArray(value);
+      const ids: string[] = (isArray ? value : [value]) as string[];
+      const children = await this._getDataByIds(meta.collection, ids);
+      if (!children.length || children.some((c) => !c))
+        throw new Error(
+          `MongooseAggregator >> buildNode >> children not found for ${JSON.stringify(
+            meta
+          )}`
+        );
+      const childNodes: IComponentNode[] = await Promise.all(
+        children.map((child) =>
+          this._buildNode(key, metaConfig, metaMap, child)
+        )
+      );
+
+      node[key] = isArray ? childNodes : childNodes[0];
+    }
+    return node;
   }
 }

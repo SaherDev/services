@@ -18,7 +18,7 @@ import { join } from 'path';
       configPaths: [
         ENV_COMMON_CONFIG_FILE_PATH,
         ENV_LIBRARY_SERVICE_FILE_PATH,
-        join(__dirname, '../src/config/meta-config.yaml'),
+        join(__dirname, '../src/config/global.config.yaml'),
       ],
       validatingSchema: configValidationSchema,
       options: {

@@ -21,7 +21,7 @@ export class LibraryService {
     private readonly collectionsAggregator: ICollectionsAggregator,
     private readonly config: ConfigService
   ) {
-    this._metaConfig = this.config.get('componentMetaConfig');
+    this._metaConfig = this.config.get('global.componentMetaConfig');
   }
 
   async createLibraryObject(

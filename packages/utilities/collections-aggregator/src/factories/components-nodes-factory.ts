@@ -10,6 +10,7 @@ const META_KEY_SEPARATOR = '.';
 export class ComponentsNodesFactory {
   constructor(
     private readonly _componentClassTypeDictionary: Record<string, ClassType>,
+    private readonly _version: string,
     private readonly _whitelist: boolean = false
   ) {
     this._validate();
@@ -18,7 +19,8 @@ export class ComponentsNodesFactory {
   private _validate(): void {
     if (
       !this._componentClassTypeDictionary ||
-      !Object.keys(this._componentClassTypeDictionary).length
+      !Object.keys(this._componentClassTypeDictionary).length ||
+      !this._version.length
     ) {
       throw new Error(
         'ComponentsFactory >> constructor failed, componentClassTypeDictionary is required'
@@ -110,7 +112,10 @@ export class ComponentsNodesFactory {
     const entry = this._getComponentNodeMeta(startName, metaConfig);
     let _class = this._createComponentClassType(entry.classTypeName, rawData);
 
-    const componentNode: IComponentNode = new ComponentNode(entry.collection);
+    const componentNode: IComponentNode = new ComponentNode(
+      entry.collection,
+      this._version
+    );
 
     await this._processRawData(
       entry,

@@ -5,8 +5,10 @@ import { IComponentNode } from './component-node.interface';
 export class ComponentNode implements IComponentNode {
   public id: string;
   public collection: string;
-  constructor(collection: string) {
+  public _v: string;
+  constructor(collection: string, version: string) {
     this.collection = collection;
+    this._v = version;
     this.id = uuid();
   }
 

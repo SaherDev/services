@@ -32,7 +32,12 @@ export const LIBRARY_DB_CONNECTION = 'LIBRARY_DB_CONNECTION';
     LibraryService,
     {
       provide: ComponentsNodesFactory,
-      useFactory: () => new ComponentsNodesFactory(LibraryClasses),
+      useFactory: (config: ConfigService) =>
+        new ComponentsNodesFactory(
+          LibraryClasses,
+          config.get('environment.database.version')
+        ),
+      inject: [ConfigService],
     },
     {
       provide: COLLECTIONS_AGGREGATOR,

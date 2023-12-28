@@ -170,10 +170,53 @@ export class MongooseAggregator implements ICollectionsAggregator {
         {
           $project: {
             _customOrder: 0,
+            _id: 0,
           },
         },
       ])
       .toArray();
+  }
+
+  private async _pullNodeChildren(
+    name: string,
+    metaConfig: Record<string, IComponentsMeta>,
+    node: any
+  ): Promise<Record<string, any>> {
+    const entries = Object.entries(typeof node === 'object' ? node : {});
+
+    const groupedNodes: Map<string, string[]> = new Map<string, string[]>();
+    const nodeChildren: Record<string, any> = {};
+    for (const [key, value] of entries) {
+      const meta = this._getMetaConfig(name, key, metaConfig);
+      if (!meta) continue;
+
+      const ids: string[] = (
+        Array.isArray(value) ? value : [value]
+      ) as string[];
+
+      if (!groupedNodes.has(meta.collection))
+        groupedNodes.set(meta.collection, []);
+
+      groupedNodes.get(meta.collection)?.push(...ids);
+    }
+
+    for (const [collection, keys] of groupedNodes.entries()) {
+      const result: any[] = await this._getDataByIds(collection, keys);
+      result.forEach((ob) => {
+        nodeChildren[ob.id] = ob;
+      });
+    }
+
+    return nodeChildren;
+  }
+
+  private _getMetaConfig(
+    name: string,
+    key: string,
+    metaConfig: Record<string, IComponentsMeta>
+  ): IComponentsMeta | undefined {
+    const metaKey = `${name?.split('.')?.at(-1) ?? name}.${key}`;
+    return metaConfig[metaKey];
   }
 
   private async _buildNode(
@@ -182,15 +225,20 @@ export class MongooseAggregator implements ICollectionsAggregator {
     metaMap: Map<string, string[]>,
     node: any
   ): Promise<any> {
-    for (const [key, value] of Object.entries(
-      typeof node === 'object' ? node : {}
-    )) {
-      const metaKey = `${name?.split('.')?.at(-1) ?? name}.${key}`;
-      const meta = metaConfig[metaKey];
+    const groupedChild: Record<string, any> = await this._pullNodeChildren(
+      name,
+      metaConfig,
+      node
+    );
+
+    const entries = Object.entries(typeof node === 'object' ? node : {});
+
+    for (const [key, value] of entries) {
+      const meta = this._getMetaConfig(name, key, metaConfig);
       if (!meta) continue;
       const isArray: boolean = Array.isArray(value);
       const ids: string[] = (isArray ? value : [value]) as string[];
-      const children = await this._getDataByIds(meta.collection, ids);
+      const children = ids.map((id) => groupedChild[id]);
       if (!children.length || children.some((c) => !c))
         throw new Error(
           `MongooseAggregator >> buildNode >> children not found for ${JSON.stringify(
